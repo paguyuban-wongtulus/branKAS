@@ -98,8 +98,8 @@
   <p id="loading-text" class="text-white/50 font-semibold text-[11px] mt-4 tracking-[0.2em] uppercase">Memuat sistem branKAS...</p>
 </div>
 
+<!-- Penjamin Hapus Loader Maksimal 1.2 Detik -->
 <script>
-  // FAIL-SAFE: Jamin loader pasti hilang setelah max 1.2 detik demi mencegah stuck di GitHub Pages
   setTimeout(() => {
     const el = document.getElementById('loading-overlay');
     if (el && el.style.display !== 'none') {
@@ -374,6 +374,19 @@
               <div class="flex flex-col min-w-0">
                 <span class="text-[13px] font-semibold text-white">Logo & Tampilan Aplikasi</span>
                 <span class="text-[10px] text-white/50 truncate">Kustomisasi logo, warna gradien, atau gambar</span>
+              </div>
+              <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
+            </div>
+          </div>
+          
+          <div id="menu-setting-firebase" class="ios-list-item !py-3 active-spring">
+            <div class="w-8 h-8 rounded-full bg-ios-yellow/20 text-yellow-400 flex items-center justify-center mr-3 shrink-0 text-xs border border-yellow-400/30">
+              <i class="fa-solid fa-server"></i>
+            </div>
+            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
+              <div class="flex flex-col min-w-0">
+                <span class="text-[13px] font-semibold text-white">Konfigurasi Firebase</span>
+                <span class="text-[10px] text-white/50 truncate">Atur API Key untuk database online</span>
               </div>
               <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
             </div>
@@ -698,24 +711,29 @@
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- SCRIPT UTAMA & FIREBASE (ESM BROWSER)      -->
+<!-- ========================================== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, deleteDoc, onSnapshot, collection, getDocs, setDoc, query, where, orderBy, limit as limitQuery } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const CACHE_KEY = 'brankas_v18_scalable_app'; 
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'brankas-wongtulus-app';
 
+// ===============================================================
+// DEFAULT FIREBASE CONFIG FALLBACK (Data Demo Lokal)
+// ===============================================================
 const defaultFirebaseConfig = {
-  apiKey: "AIzaSyDemoKeyForBranKASPaguyubanWongtulus123",
-  authDomain: "brankas-wongtulus.firebaseapp.com",
-  projectId: "brankas-wongtulus",
-  storageBucket: "brankas-wongtulus.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:demo123456789"
+  apiKey: "MASUKKAN_API_KEY_ANDA_DISINI",
+  authDomain: "MASUKKAN_PROJECT_ID_ANDA.firebaseapp.com",
+  projectId: "MASUKKAN_PROJECT_ID_ANDA",
+  storageBucket: "MASUKKAN_PROJECT_ID_ANDA.appspot.com",
+  messagingSenderId: "MASUKKAN_SENDER_ID_ANDA",
+  appId: "MASUKKAN_APP_ID_ANDA"
 };
-
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
+// ===============================================================
 
 let app = null;
 let db = null;
@@ -743,13 +761,8 @@ let currentActivityIndex = 0;
 let liveClockInterval = null;
 let memSearchTimer = null;
 
-function getCollectionRef(colName) {
-  return collection(db, 'artifacts', appId, 'public', 'data', colName);
-}
-
-function getDocRef(colName, docId) {
-  return doc(db, 'artifacts', appId, 'public', 'data', colName, docId);
-}
+function getCollectionRef(colName) { return collection(db, colName); }
+function getDocRef(colName, docId) { return doc(db, colName, docId); }
 
 function updateNetworkStatusBadge(status) {
   const badge = document.getElementById('firebase-status-badge');
@@ -774,30 +787,41 @@ function updateNetworkStatusBadge(status) {
 
 async function initFirebaseAndApp() {
   updateNetworkStatusBadge('connecting');
+  
+  const savedConfigStr = localStorage.getItem('brankas_firebase_config');
+  const activeConfig = savedConfigStr ? JSON.parse(savedConfigStr) : defaultFirebaseConfig;
+
+  // Cek apakah key masih palsu/demo (mencegah stuck pending network)
+  if (activeConfig.apiKey.includes('MASUKKAN') || !activeConfig.apiKey || activeConfig.apiKey === '') {
+    updateNetworkStatusBadge('offline');
+    loadLocalFallbackData();
+    return;
+  }
+
+  // Safety Timer (Timeout 1.5 Detik). Jika dalam 1.5 detik gagal, paksa mode lokal agar tidak stuck.
   const safetyTimer = setTimeout(() => {
     updateNetworkStatusBadge('offline');
     loadLocalFallbackData();
-  }, 1200);
+    showToast('Koneksi Firebase gagal/lambat. Beralih mode lokal.', 'error');
+  }, 1500);
 
   try {
-    app = initializeApp(firebaseConfig);
+    app = initializeApp(activeConfig);
     db = getFirestore(app);
     auth = getAuth(app);
+    
+    // Tunggu autentikasi anonim berhasil agar rules Firestore tidak menolak akses
+    const userCred = await signInAnonymously(auth);
+    authUser = userCred.user;
 
-    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-      const userCred = await signInWithCustomToken(auth, __initial_auth_token);
-      authUser = userCred.user;
-    } else {
-      const userCred = await signInAnonymously(auth);
-      authUser = userCred.user;
-    }
-
-    clearTimeout(safetyTimer);
+    clearTimeout(safetyTimer); // Jika berhasil sebelum 1.5s, batalkan mode offline
     setupRealtimeListeners();
   } catch (err) {
     clearTimeout(safetyTimer);
     updateNetworkStatusBadge('offline');
     loadLocalFallbackData();
+    showToast('Kredensial Firebase tidak valid atau diblokir. Masuk mode lokal.', 'error');
+    console.error("Firebase Init Error:", err);
   }
 }
 
@@ -842,7 +866,9 @@ function setupRealtimeListeners() {
     localStorage.setItem(CACHE_KEY, JSON.stringify(appState));
     if (appState.currentUser) refreshCurrentView();
     onCollectionUpdated();
-  }, () => {
+  }, (err) => {
+    console.error("Tx Listener Error:", err);
+    // Fallback jika index belum dibuat
     const simpleTxQuery = query(getCollectionRef('transactions'), limitQuery(100));
     const unsubSimple = onSnapshot(simpleTxQuery, snapshot => {
       const txs = [];
@@ -946,7 +972,7 @@ function loadLocalFallbackData() {
     appState = {
       users: [{ id: 'U-1', username: 'admin', password: '123', role: 'Admin' }],
       members: [
-        { id: 'M-1', name: 'Bpk. Budi Santoso', phone: '081234567890', address: 'Blok A1 No. 5', joinDate: '2023-01-01', lastPaid: `${curY}-${String(new Date().getMonth()).padStart(2, '0')}` },
+        { id: 'M-1', name: 'Bpk. Budi Santoso (Data Demo Lokal)', phone: '081234567890', address: 'Blok A1 No. 5', joinDate: '2023-01-01', lastPaid: `${curY}-${String(new Date().getMonth()).padStart(2, '0')}` },
         { id: 'M-2', name: 'Ibu Siti Aisyah', phone: '081987654321', address: 'Blok B2 No. 8', joinDate: '2023-05-10', lastPaid: `${curY}-${curM}` }
       ],
       categories: [
@@ -1460,7 +1486,7 @@ async function renderTransactions() {
   const list = document.getElementById('list-transactions-view');
   const loadMoreContainer = document.getElementById('load-more-tx-container');
 
-  if (db && authUser) {
+  if (db && authUser && !localStorage.getItem('brankas_firebase_config')?.includes('MASUKKAN_')) {
     try {
       const q = query(
         getCollectionRef('transactions'),
@@ -1897,47 +1923,4 @@ function renderReports() {
             <div class="bg-ios-red h-1.5 rounded-full transition-all duration-500" style="width: ${pct}%;"></div>
           </div>
           <div class="space-y-0.5 mt-2">
-            <div class="text-[9px] font-bold uppercase tracking-wider text-white/40 mb-1">Keterangan Lengkap (${txList.length}):</div>
-            ${itemsHtml}
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-}
-
-function generateWhatsAppMessageText(customUrl = '') {
-  const m = document.getElementById('report-month').value;
-  const y = document.getElementById('report-year').value;
-  const t = new Date();
-  const dStr = formatDateIndo(t.toISOString().split('T')[0]);
-  
-  const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const mIdx = parseInt(m, 10) - 1;
-  const currentMonthName = mn[mIdx];
-  
-  let prevMonthIdx = mIdx - 1;
-  let prevYearStr = y;
-  if (prevMonthIdx < 0) { prevMonthIdx = 11; prevYearStr = (parseInt(y, 10) - 1).toString(); }
-  const prevMonthName = mn[prevMonthIdx];
-  
-  let txt = `*REKAP KEUANGAN PAGUYUBAN*\n_Per: ${dStr}_\n------------------------\n\n`;
-  const pBal = document.getElementById('report-prev-balance').innerText;
-  const pIn = document.getElementById('report-in').innerText;
-  const pOut = document.getElementById('report-out').innerText;
-  const pNet = document.getElementById('report-net').innerText;
-  
-  txt += `💼 Saldo Akhir ${prevMonthName} ${prevYearStr}: ${pBal}\n📈 Pemasukan ${currentMonthName} ${y}: ${pIn}\n📉 Pengeluaran ${currentMonthName} ${y}: ${pOut}\n💰 *KAS AKTIF: ${pNet}*\n\n`;
-  
-  let iuranBulananTotal = 0;
-  let otherIncomeDetails = [];
-  let expenseDetails = [];
-
-  appState.transactions.forEach(tx => {
-    if(!tx.date) return;
-    const [ty, tm] = tx.date.split('-');
-    if (ty === y && tm === m) {
-      const amt = Number(tx.amount) || 0;
-      if (tx.type === 'Pemasukan') {
-        if (isIuran(tx.category)) iuranBulananTotal += amt;
-        else otherIncomeDetails.push(`+ ${tx.category}: ${
+            <div class="text-[9px] font-bold upperc
