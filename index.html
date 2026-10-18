@@ -87,7 +87,7 @@
 
 <body class="w-full h-[100dvh] flex flex-col justify-between text-white bg-black">
 
-<!-- Fail-Safe Global Loader -->
+<!-- Fail-Safe Global Loader: Akan hilang maksimal dalam 1.2 detik -->
 <div id="loading-overlay" class="fixed inset-0 z-[99999] bg-[#000000] flex flex-col items-center justify-center transition-opacity duration-300">
   <div class="relative flex justify-center items-center">
     <div class="w-14 h-14 border-4 border-white/10 border-t-ios-blue rounded-full animate-spin"></div>
@@ -98,7 +98,7 @@
   <p id="loading-text" class="text-white/50 font-semibold text-[11px] mt-4 tracking-[0.2em] uppercase">Memuat sistem branKAS...</p>
 </div>
 
-<!-- Penjamin Hapus Loader Maksimal 1.2 Detik -->
+<!-- Penjamin Loader Eksternal (Menghentikan Loader apa pun yang terjadi) -->
 <script>
   setTimeout(() => {
     const el = document.getElementById('loading-overlay');
@@ -130,7 +130,8 @@
       <span class="w-3 h-[1px] bg-white/20"></span>
     </p>
 
-    <form id="login-form" class="w-full space-y-3.5">
+    <!-- FORM LOGIN: Menggunakan onsubmit="event.preventDefault()" untuk cegah Reload! -->
+    <form id="login-form" onsubmit="event.preventDefault();" class="w-full space-y-3.5">
       <div class="ios-list shadow-xl bg-[#1C1C1E]/80 backdrop-blur-2xl">
         <div class="flex items-center px-4 py-2 border-b border-white/10">
           <div class="w-6 flex justify-center text-white/40 shrink-0 text-xs"><i class="fa-solid fa-user"></i></div>
@@ -142,7 +143,7 @@
         </div>
       </div>
       <div id="login-error" class="hidden text-[12px] text-ios-red text-center font-medium px-3 py-2 bg-ios-red/10 rounded-xl border border-ios-red/20"></div>
-      <button type="submit" class="w-full py-3 rounded-[18px] bg-ios-blue text-white font-semibold text-[15px] active-spring shadow-[0_8px_20px_rgba(10,132,255,0.35)]">
+      <button type="submit" id="btn-login-submit" class="w-full py-3 rounded-[18px] bg-ios-blue text-white font-semibold text-[15px] active-spring shadow-[0_8px_20px_rgba(10,132,255,0.35)]">
         Masuk Sistem
       </button>
     </form>
@@ -378,15 +379,15 @@
               <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
             </div>
           </div>
-          
+
           <div id="menu-setting-firebase" class="ios-list-item !py-3 active-spring">
             <div class="w-8 h-8 rounded-full bg-ios-yellow/20 text-yellow-400 flex items-center justify-center mr-3 shrink-0 text-xs border border-yellow-400/30">
               <i class="fa-solid fa-server"></i>
             </div>
             <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
               <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-semibold text-white">Konfigurasi Firebase</span>
-                <span class="text-[10px] text-white/50 truncate">Atur API Key untuk database online</span>
+                <span class="text-[13px] font-semibold text-white">Konfigurasi Database</span>
+                <span class="text-[10px] text-white/50 truncate">Masukkan API Key agar aplikasi menjadi Online</span>
               </div>
               <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
             </div>
@@ -715,30 +716,10 @@
 <!-- SCRIPT UTAMA & FIREBASE (ESM BROWSER)      -->
 <!-- ========================================== -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, deleteDoc, onSnapshot, collection, getDocs, setDoc, query, where, orderBy, limit as limitQuery } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// DYNAMIC IMPORTS: Mencegah script error ketika CDN Google diblokir / Offline
+let fb = {}; 
 
 const CACHE_KEY = 'brankas_v18_scalable_app'; 
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'brankas-wongtulus-app';
-
-// ===============================================================
-// DEFAULT FIREBASE CONFIG FALLBACK (Data Demo Lokal)
-// ===============================================================
-const defaultFirebaseConfig = {
-  apiKey: "MASUKKAN_API_KEY_ANDA_DISINI",
-  authDomain: "MASUKKAN_PROJECT_ID_ANDA.firebaseapp.com",
-  projectId: "MASUKKAN_PROJECT_ID_ANDA",
-  storageBucket: "MASUKKAN_PROJECT_ID_ANDA.appspot.com",
-  messagingSenderId: "MASUKKAN_SENDER_ID_ANDA",
-  appId: "MASUKKAN_APP_ID_ANDA"
-};
-// ===============================================================
-
-let app = null;
-let db = null;
-let auth = null;
-let authUser = null;
 
 let appState = { 
   transactions: [], 
@@ -761,8 +742,20 @@ let currentActivityIndex = 0;
 let liveClockInterval = null;
 let memSearchTimer = null;
 
-function getCollectionRef(colName) { return collection(db, colName); }
-function getDocRef(colName, docId) { return doc(db, colName, docId); }
+let db = null;
+let authUser = null;
+
+// ===============================================================
+// PENYIMPANAN LOGIC KREDENSIAL LOKAL
+// ===============================================================
+function getFirebaseConfig() {
+  const savedConfigStr = localStorage.getItem('brankas_firebase_config');
+  if (savedConfigStr) return JSON.parse(savedConfigStr);
+  return null;
+}
+
+function getCollectionRef(colName) { return fb.collection(db, colName); }
+function getDocRef(colName, docId) { return fb.doc(db, colName, docId); }
 
 function updateNetworkStatusBadge(status) {
   const badge = document.getElementById('firebase-status-badge');
@@ -788,39 +781,60 @@ function updateNetworkStatusBadge(status) {
 async function initFirebaseAndApp() {
   updateNetworkStatusBadge('connecting');
   
-  const savedConfigStr = localStorage.getItem('brankas_firebase_config');
-  const activeConfig = savedConfigStr ? JSON.parse(savedConfigStr) : defaultFirebaseConfig;
+  const activeConfig = getFirebaseConfig();
 
-  // Cek apakah key masih palsu/demo (mencegah stuck pending network)
-  if (activeConfig.apiKey.includes('MASUKKAN') || !activeConfig.apiKey || activeConfig.apiKey === '') {
+  // Safety Timer (1.5 Detik).
+  const safetyTimer = setTimeout(() => {
+    updateNetworkStatusBadge('offline');
+    loadLocalFallbackData();
+    showToast('Mode Lokal Diaktifkan (Offline)', 'error');
+  }, 1500);
+
+  if (!activeConfig || !activeConfig.apiKey || activeConfig.apiKey === '') {
+    // Tanpa config, diam-diam langsung pakai fallback
+    clearTimeout(safetyTimer);
     updateNetworkStatusBadge('offline');
     loadLocalFallbackData();
     return;
   }
 
-  // Safety Timer (Timeout 1.5 Detik). Jika dalam 1.5 detik gagal, paksa mode lokal agar tidak stuck.
-  const safetyTimer = setTimeout(() => {
-    updateNetworkStatusBadge('offline');
-    loadLocalFallbackData();
-    showToast('Koneksi Firebase gagal/lambat. Beralih mode lokal.', 'error');
-  }, 1500);
-
   try {
-    app = initializeApp(activeConfig);
-    db = getFirestore(app);
-    auth = getAuth(app);
+    // Dynamic import to prevent script parsing halt
+    const [appMod, authMod, fsMod] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js")
+    ]);
+
+    fb.initializeApp = appMod.initializeApp;
+    fb.getAuth = authMod.getAuth;
+    fb.signInAnonymously = authMod.signInAnonymously;
+    fb.getFirestore = fsMod.getFirestore;
+    fb.doc = fsMod.doc;
+    fb.deleteDoc = fsMod.deleteDoc;
+    fb.onSnapshot = fsMod.onSnapshot;
+    fb.collection = fsMod.collection;
+    fb.getDocs = fsMod.getDocs;
+    fb.setDoc = fsMod.setDoc;
+    fb.query = fsMod.query;
+    fb.where = fsMod.where;
+    fb.orderBy = fsMod.orderBy;
+    fb.limitQuery = fsMod.limit;
+
+    const app = fb.initializeApp(activeConfig);
+    db = fb.getFirestore(app);
+    const auth = fb.getAuth(app);
     
-    // Tunggu autentikasi anonim berhasil agar rules Firestore tidak menolak akses
-    const userCred = await signInAnonymously(auth);
+    const userCred = await fb.signInAnonymously(auth);
     authUser = userCred.user;
 
-    clearTimeout(safetyTimer); // Jika berhasil sebelum 1.5s, batalkan mode offline
+    clearTimeout(safetyTimer);
     setupRealtimeListeners();
   } catch (err) {
     clearTimeout(safetyTimer);
     updateNetworkStatusBadge('offline');
     loadLocalFallbackData();
-    showToast('Kredensial Firebase tidak valid atau diblokir. Masuk mode lokal.', 'error');
+    showToast('Kredensial Firebase tidak valid / Offline. Masuk mode lokal.', 'error');
     console.error("Firebase Init Error:", err);
   }
 }
@@ -852,14 +866,14 @@ function setupRealtimeListeners() {
   const now = new Date();
   const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   
-  const txQuery = query(
+  const txQuery = fb.query(
     getCollectionRef('transactions'),
-    where('date', '>=', `${currentMonthStr}-01`),
-    orderBy('date', 'desc'),
-    limitQuery(100)
+    fb.where('date', '>=', `${currentMonthStr}-01`),
+    fb.orderBy('date', 'desc'),
+    fb.limitQuery(100)
   );
 
-  const unsubTx = onSnapshot(txQuery, snapshot => {
+  const unsubTx = fb.onSnapshot(txQuery, snapshot => {
     const txs = [];
     snapshot.forEach(docSnap => txs.push({ id: docSnap.id, ...docSnap.data() }));
     appState.transactions = txs;
@@ -867,10 +881,8 @@ function setupRealtimeListeners() {
     if (appState.currentUser) refreshCurrentView();
     onCollectionUpdated();
   }, (err) => {
-    console.error("Tx Listener Error:", err);
-    // Fallback jika index belum dibuat
-    const simpleTxQuery = query(getCollectionRef('transactions'), limitQuery(100));
-    const unsubSimple = onSnapshot(simpleTxQuery, snapshot => {
+    const simpleTxQuery = fb.query(getCollectionRef('transactions'), fb.limitQuery(100));
+    const unsubSimple = fb.onSnapshot(simpleTxQuery, snapshot => {
       const txs = [];
       snapshot.forEach(docSnap => txs.push({ id: docSnap.id, ...docSnap.data() }));
       appState.transactions = txs;
@@ -882,7 +894,7 @@ function setupRealtimeListeners() {
   });
   activeUnsubscribers.push(unsubTx);
 
-  const unsubMembers = onSnapshot(query(getCollectionRef('members'), limitQuery(500)), snapshot => {
+  const unsubMembers = fb.onSnapshot(fb.query(getCollectionRef('members'), fb.limitQuery(500)), snapshot => {
     const mems = [];
     snapshot.forEach(docSnap => mems.push({ id: docSnap.id, ...docSnap.data() }));
     appState.members = mems;
@@ -892,7 +904,7 @@ function setupRealtimeListeners() {
   }, () => { onCollectionUpdated(); updateNetworkStatusBadge('offline'); });
   activeUnsubscribers.push(unsubMembers);
 
-  const unsubUsers = onSnapshot(getCollectionRef('users'), snapshot => {
+  const unsubUsers = fb.onSnapshot(getCollectionRef('users'), snapshot => {
     const usrs = [];
     snapshot.forEach(docSnap => usrs.push({ id: docSnap.id, ...docSnap.data() }));
     appState.users = usrs.length > 0 ? usrs : [{ id: 'U-1', username: 'admin', password: '123', role: 'Admin' }];
@@ -902,7 +914,7 @@ function setupRealtimeListeners() {
   }, () => { onCollectionUpdated(); updateNetworkStatusBadge('offline'); });
   activeUnsubscribers.push(unsubUsers);
 
-  const unsubCategories = onSnapshot(getCollectionRef('categories'), snapshot => {
+  const unsubCategories = fb.onSnapshot(getCollectionRef('categories'), snapshot => {
     const cats = [];
     snapshot.forEach(docSnap => cats.push({ id: docSnap.id, ...docSnap.data() }));
     appState.categories = cats;
@@ -912,7 +924,7 @@ function setupRealtimeListeners() {
   }, () => { onCollectionUpdated(); updateNetworkStatusBadge('offline'); });
   activeUnsubscribers.push(unsubCategories);
 
-  const unsubSettings = onSnapshot(getCollectionRef('settings'), snapshot => {
+  const unsubSettings = fb.onSnapshot(getCollectionRef('settings'), snapshot => {
     const sets = [];
     snapshot.forEach(docSnap => sets.push({ id: docSnap.id, ...docSnap.data() }));
     appState.settings = sets;
@@ -937,11 +949,11 @@ function setupRealtimeListeners() {
 async function checkAndSeedInitialData() {
   if (!db || !authUser) return;
   try {
-    const userSnap = await getDocs(getCollectionRef('users'));
+    const userSnap = await fb.getDocs(getCollectionRef('users'));
     if (userSnap.empty) {
-      await setDoc(getDocRef('users', 'U-1'), { username: 'admin', password: '123', role: 'Admin' });
-      await setDoc(getDocRef('settings', 'nominal_iuran'), { key: 'nominal_iuran', value: '15000' });
-      await setDoc(getDocRef('settings', 'app_logo'), { key: 'app_logo', mode: 'preset', icon: 'fa-vault', color: 'from-ios-blue to-blue-700' });
+      await fb.setDoc(getDocRef('users', 'U-1'), { username: 'admin', password: '123', role: 'Admin' });
+      await fb.setDoc(getDocRef('settings', 'nominal_iuran'), { key: 'nominal_iuran', value: '15000' });
+      await fb.setDoc(getDocRef('settings', 'app_logo'), { key: 'app_logo', mode: 'preset', icon: 'fa-vault', color: 'from-ios-blue to-blue-700' });
       
       const defaultCats = [
         { id: 'cat-1', type: 'Pemasukan', name: 'Iuran Bulanan' },
@@ -951,7 +963,7 @@ async function checkAndSeedInitialData() {
         { id: 'cat-5', type: 'Pengeluaran', name: 'Konsumsi Rapat' }
       ];
       for (const cat of defaultCats) {
-        await setDoc(getDocRef('categories', cat.id), cat);
+        await fb.setDoc(getDocRef('categories', cat.id), cat);
       }
     }
   } catch(e) {}
@@ -1063,8 +1075,9 @@ function showConfirm(msg, callback) {
   document.getElementById('btn-modal-proceed').onclick = () => { closeAllModals(); setTimeout(callback, 300); };
 }
 
-function handleLogin(e) {
-  e.preventDefault();
+// Global handleLogin yang kebal dari crash scope module
+window.handleLogin = function(e) {
+  if(e) e.preventDefault();
   const u = String(document.getElementById('login-username').value).trim().toLowerCase();
   const p = String(document.getElementById('login-password').value).trim();
   const errEl = document.getElementById('login-error');
@@ -1486,16 +1499,16 @@ async function renderTransactions() {
   const list = document.getElementById('list-transactions-view');
   const loadMoreContainer = document.getElementById('load-more-tx-container');
 
-  if (db && authUser && !localStorage.getItem('brankas_firebase_config')?.includes('MASUKKAN_')) {
+  if (db && authUser && getFirebaseConfig()) {
     try {
-      const q = query(
+      const q = fb.query(
         getCollectionRef('transactions'),
-        where('date', '>=', `${monthFilter}-01`),
-        where('date', '<=', `${monthFilter}-31`),
-        orderBy('date', 'desc'),
-        limitQuery(txCurrentPage * txPageSize)
+        fb.where('date', '>=', `${monthFilter}-01`),
+        fb.where('date', '<=', `${monthFilter}-31`),
+        fb.orderBy('date', 'desc'),
+        fb.limitQuery(txCurrentPage * txPageSize)
       );
-      const snap = await getDocs(q);
+      const snap = await fb.getDocs(q);
       const fetchedTxs = [];
       snap.forEach(d => fetchedTxs.push({ id: d.id, ...d.data() }));
       if (fetchedTxs.length > 0) {
@@ -1921,6 +1934,4 @@ function renderReports() {
           </div>
           <div class="w-full bg-black/40 rounded-full h-1.5 mb-2">
             <div class="bg-ios-red h-1.5 rounded-full transition-all duration-500" style="width: ${pct}%;"></div>
-          </div>
-          <div class="space-y-0.5 mt-2">
-            <div class="text-[9px] font-bold upperc
+ 
