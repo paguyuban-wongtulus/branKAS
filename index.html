@@ -27,14 +27,14 @@
         },
         animation: { 
           float: 'float 5s ease-in-out infinite',
-          pulseGlow: 'pulseGlow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-          spinFast: 'spin 1.2s linear infinite',
-          syncWave: 'syncWave 1.8s ease-in-out infinite'
+          pulseGlow: 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          spinFast: 'spin 1s linear infinite',
+          syncWave: 'syncWave 1.5s ease-in-out infinite'
         },
         keyframes: { 
           float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-4px)' } },
-          pulseGlow: { '0%, 100%': { opacity: 1, transform: 'scale(1)' }, '50%': { opacity: 0.4, transform: 'scale(0.85)' } },
-          syncWave: { '0%, 100%': { opacity: 0.5, transform: 'scale(0.9)' }, '50%': { opacity: 1, transform: 'scale(1.15)' } }
+          pulseGlow: { '0%, 100%': { opacity: 1, transform: 'scale(1)' }, '50%': { opacity: 0.35, transform: 'scale(0.8)' } },
+          syncWave: { '0%, 100%': { opacity: 0.4, transform: 'scale(0.95)' }, '50%': { opacity: 1, transform: 'scale(1.1)' } }
         }
       }
     }
@@ -95,15 +95,7 @@
   input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; }
   select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 0.9rem; padding-right: 1.5rem !important; }
   
-  /* Modal Clearance Fix for Android */
-  .modal-sheet { 
-    transform: translate3d(0, 100%, 0); 
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); 
-    overscroll-behavior-y: contain; 
-    will-change: transform; 
-    padding-bottom: calc(48px + env(safe-area-inset-bottom)) !important; 
-    max-height: calc(100dvh - 20px);
-  }
+  .modal-sheet { transform: translate3d(0, 100%, 0); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); overscroll-behavior-y: contain; will-change: transform; padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
   .modal-sheet.open { transform: translate3d(0, 0, 0); }
   
   .toast-pill {
@@ -119,8 +111,8 @@
   .animate-slide-up-fade { animation: slideUpFade 4s cubic-bezier(0.32, 0.72, 0, 1) infinite; will-change: transform, opacity; }
 
   /* Offline syncing subtle animation */
-  @keyframes bgPulseSync { 0%, 100% { background-color: rgba(0, 0, 0, 0.75); } 50% { background-color: rgba(10, 132, 255, 0.15); } }
-  .sync-mode-active { animation: bgPulseSync 2.5s ease-in-out infinite !important; }
+  @keyframes bgPulseSync { 0%, 100% { background-color: rgba(10, 132, 255, 0); } 50% { background-color: rgba(10, 132, 255, 0.05); } }
+  .sync-mode-active { animation: bgPulseSync 2s ease-in-out infinite; }
 </style>
 
 <!-- Pre-fetch logo from local cache to prevent flashing -->
@@ -162,7 +154,7 @@
       <span class="w-3 h-[1px] bg-white/20"></span> Paguyuban Wongtulus <span class="w-3 h-[1px] bg-white/20"></span>
     </p>
 
-    <form id="login-form" class="w-full space-y-2.5">
+    <form id="login-form" class="w-full space-y-2.5" onsubmit="event.preventDefault(); handleLogin(); return false;">
       <div class="ios-list shadow-xl bg-[#1C1C1E]/85 backdrop-blur-2xl !rounded-[14px]">
         <div class="flex items-center px-3 py-1 border-b border-white/10">
           <div class="w-5 flex justify-center text-white/40 shrink-0 text-[10px]"><i class="fa-solid fa-user"></i></div>
@@ -174,13 +166,13 @@
         </div>
       </div>
       <div id="login-error" class="hidden text-[11px] text-ios-red text-center font-medium px-2 py-1 bg-ios-red/10 rounded-[10px] border border-ios-red/20"></div>
-      <button type="submit" id="btn-submit-login" class="w-full py-2.5 rounded-[14px] bg-ios-blue text-white font-semibold text-[14px] active-spring shadow-[0_6px_15px_rgba(10,132,255,0.35)]">Masuk Sistem</button>
+      <button type="submit" id="btn-submit-login" onclick="handleLogin()" class="w-full py-2.5 rounded-[14px] bg-ios-blue text-white font-semibold text-[14px] active-spring shadow-[0_6px_15px_rgba(10,132,255,0.35)]">Masuk Sistem</button>
     </form>
   </div>
 </div>
 
 <div id="app-wrapper" class="w-full h-full flex flex-col hidden relative items-center overflow-hidden">
-  <header id="main-header-bar" class="absolute top-0 left-0 right-0 z-40 blur-header px-3 pb-2 flex items-center justify-center shadow-md w-full transition-colors duration-500">
+  <header class="absolute top-0 left-0 right-0 z-40 blur-header px-3 pb-2 flex items-center justify-center shadow-md w-full">
     <div class="w-full max-w-md flex items-center justify-between">
       <div class="flex items-center gap-2">
         <div id="header-logo-box" class="w-7 h-7 rounded-[8px] bg-gradient-to-br from-ios-blue to-blue-600 flex items-center justify-center text-white shadow-sm overflow-hidden relative border border-white/15 shrink-0">
@@ -191,8 +183,8 @@
           <div class="flex items-center gap-2 leading-none">
             <span class="font-bold text-[15px] tracking-tight text-white">branKAS</span>
             <div class="flex items-center gap-1.5 ml-1" id="network-indicator">
-              <span id="firebase-status-dot" class="w-1.5 h-1.5 rounded-full bg-ios-orange animate-spinFast shadow-[0_0_8px_#FF9F0A]"></span>
-              <span id="firebase-status-text" class="text-[10px] text-ios-orange font-bold tracking-tight drop-shadow-sm">Menghubungkan...</span>
+              <span id="firebase-status-dot" class="w-2 h-2 rounded-full bg-ios-orange animate-spinFast shadow-[0_0_10px_#FF9F0A]"></span>
+              <span id="firebase-status-text" class="text-[10px] text-white/70 font-semibold tracking-tight">Menghubungkan...</span>
             </div>
           </div>
           <span class="text-[8px] text-white/50 font-semibold tracking-wider uppercase mt-1 leading-none">Wongtulus</span>
@@ -211,7 +203,7 @@
   </header>
 
   <div class="flex flex-1 w-full pt-[calc(max(env(safe-area-inset-top),6px)+42px)] h-full justify-center overflow-hidden relative z-10">
-    <main class="flex-1 w-full max-w-md h-full overflow-y-auto overscroll-y-contain scroll-smooth p-2.5 pb-[calc(140px+env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch] transform-gpu">
+    <main class="flex-1 w-full max-w-md h-full overflow-y-auto overscroll-y-contain scroll-smooth p-2.5 pb-[calc(76px+max(10px,env(safe-area-inset-bottom)))] [-webkit-overflow-scrolling:touch] transform-gpu">
       
       <!-- TAB DASHBOARD -->
       <div id="tab-dashboard" class="tab-content tab-enter space-y-2">
@@ -280,8 +272,8 @@
           <input type="month" id="filter-tx-month" class="ios-input w-[125px] shrink-0 h-8 bg-white/10 px-2 text-[15px]">
         </div>
 
-        <div id="bulk-delete-btn-container" class="hidden mb-1 transition-all duration-300">
-           <button id="bulk-delete-btn" type="button" class="admin-only w-full h-9 px-2 bg-ios-red/15 rounded-[10px] text-[12px] font-semibold text-ios-red active-spring flex justify-center items-center gap-1.5 shadow-sm"><i class="fa-solid fa-trash"></i> Hapus Terpilih</button>
+        <div id="bulk-delete-btn-container" class="hidden mb-1">
+           <button id="bulk-delete-btn" type="button" class="admin-only w-full h-9 px-2 bg-ios-red/15 rounded-[10px] text-[12px] font-semibold text-ios-red active-spring flex justify-center items-center gap-1.5"><i class="fa-solid fa-trash"></i> Hapus Terpilih</button>
         </div>
 
         <div class="ios-list shadow-sm bg-[#1C1C1E]/80">
@@ -415,17 +407,15 @@
     </main>
   </div>
 
-  <div class="fixed left-0 right-0 z-30 flex justify-center pointer-events-none w-full transition-all duration-300" style="bottom: calc(36px + env(safe-area-inset-bottom));">
-    <nav class="floating-nav w-[calc(100%-2.5rem)] max-w-[380px] flex justify-around items-center h-[64px] px-2 pointer-events-auto mx-auto relative bg-[#1C1C1E]/95 backdrop-blur-3xl border border-white/15 shadow-[0_20px_40px_rgba(0,0,0,0.7)] rounded-[24px]">
-      <button id="botnav-dashboard" class="flex flex-col items-center justify-center gap-1 w-[20%] text-white active-spring"><i class="fa-solid fa-house text-[18px]"></i><span class="text-[8px] font-medium tracking-wide">Ringkasan</span></button>
-      <button id="botnav-transactions" class="flex flex-col items-center justify-center gap-1 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-wallet text-[18px]"></i><span class="text-[8px] font-medium tracking-wide">Transaksi</span></button>
-      
-      <div class="flex flex-col items-center justify-center -mt-8 admin-only w-[20%] relative z-50">
-        <button id="btn-floating-action" class="w-[56px] h-[56px] rounded-full bg-gradient-to-tr from-ios-blue to-blue-500 text-white shadow-[0_10px_25px_rgba(10,132,255,0.4)] flex items-center justify-center active-spring border-[4px] border-[#000000]"><i class="fa-solid fa-plus text-[22px]"></i></button>
+  <div class="fixed bottom-0 left-0 right-0 z-30 flex justify-center pointer-events-none pb-[max(6px,env(safe-area-inset-bottom))] w-full">
+    <nav class="floating-nav w-[calc(100%-1.25rem)] max-w-[380px] flex justify-around items-center h-[52px] px-1 pointer-events-auto mx-auto relative">
+      <button id="botnav-dashboard" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white active-spring"><i class="fa-solid fa-house text-[16px]"></i><span class="text-[7.5px] font-medium tracking-wide">Ringkasan</span></button>
+      <button id="botnav-transactions" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-wallet text-[16px]"></i><span class="text-[7.5px] font-medium tracking-wide">Transaksi</span></button>
+      <div class="flex flex-col items-center justify-center -mt-5 admin-only w-[20%] relative z-50">
+        <button id="btn-floating-action" class="w-[46px] h-[46px] rounded-full bg-ios-blue text-white shadow-[0_5px_12px_rgba(10,132,255,0.5)] flex items-center justify-center active-spring border-[3px] border-[#000000]"><i class="fa-solid fa-plus text-[18px]"></i></button>
       </div>
-      
-      <button id="botnav-members" class="flex flex-col items-center justify-center gap-1 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-users text-[18px]"></i><span class="text-[8px] font-medium tracking-wide">Anggota</span></button>
-      <button id="botnav-reports" class="flex flex-col items-center justify-center gap-1 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-chart-pie text-[18px]"></i><span class="text-[8px] font-medium tracking-wide">Laporan</span></button>
+      <button id="botnav-members" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-users text-[16px]"></i><span class="text-[7.5px] font-medium tracking-wide">Anggota</span></button>
+      <button id="botnav-reports" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-chart-pie text-[16px]"></i><span class="text-[7.5px] font-medium tracking-wide">Laporan</span></button>
     </nav>
   </div>
 </div>
@@ -440,21 +430,23 @@
   </div>
 </div>
 
+<!-- TX CONTEXT MODAL -->
 <div id="modal-tx-context" class="fixed bottom-0 left-0 right-0 mx-auto z-[105] w-full max-w-md bg-[#1C1C1E] rounded-t-[24px] p-3 modal-sheet shadow-2xl border-t border-white/10">
   <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-2 shrink-0"></div>
   <div class="text-center mb-3"><h3 id="ctx-tx-title" class="text-[14px] font-bold text-white truncate px-4">Menu Transaksi</h3><p id="ctx-tx-amount" class="text-[11px] font-medium text-white/50">Rp 0</p></div>
   <div class="space-y-1.5 pb-2 px-1">
-    <button id="ctx-btn-edit" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring border border-white/5"><i class="fa-solid fa-pen text-ios-teal text-[14px]"></i> Edit Transaksi</button>
+    <button id="ctx-btn-edit" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-pen text-ios-teal text-[14px]"></i> Edit Transaksi</button>
     <button id="ctx-btn-delete" class="w-full py-2.5 bg-ios-red/15 text-ios-red border border-ios-red/20 rounded-[12px] font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-trash text-[14px]"></i> Hapus Permanen</button>
   </div>
 </div>
 
+<!-- MEMBER CONTEXT MODAL -->
 <div id="modal-member-context" class="fixed bottom-0 left-0 right-0 mx-auto z-[105] w-full max-w-md bg-[#1C1C1E] rounded-t-[24px] p-3 modal-sheet shadow-2xl border-t border-white/10">
   <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-2 shrink-0"></div>
   <div class="text-center mb-3"><h3 id="ctx-member-title" class="text-[14px] font-bold text-white truncate px-4">Menu Anggota</h3><p id="ctx-member-phone" class="text-[11px] font-medium text-white/50">-</p></div>
   <div class="space-y-1.5 pb-2 px-1">
-    <button id="ctx-member-btn-detail" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring border border-white/5"><i class="fa-solid fa-id-card text-ios-blue text-[14px]"></i> Lihat Detail</button>
-    <button id="ctx-member-btn-edit" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring border border-white/5"><i class="fa-solid fa-pen text-ios-teal text-[14px]"></i> Edit Anggota</button>
+    <button id="ctx-member-btn-detail" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-id-card text-ios-blue text-[14px]"></i> Lihat Detail</button>
+    <button id="ctx-member-btn-edit" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-pen text-ios-teal text-[14px]"></i> Edit Anggota</button>
     <button id="ctx-member-btn-delete" class="w-full py-2.5 bg-ios-red/15 text-ios-red border border-ios-red/20 rounded-[12px] font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-trash text-[14px]"></i> Hapus Anggota</button>
   </div>
 </div>
@@ -474,13 +466,8 @@
   <div id="modal-generic-content" class="pb-4 overflow-y-auto w-full"></div>
 </div>
 
+<!-- Essential scripts moved strictly inside to guarantee cached rendering -->
 <script type="text/javascript">
-  // Core Helper: Get Local Date correctly regardless of UTC offset
-  function getLocalDateString() {
-    const now = new Date();
-    return new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-  }
-
   function renderGlobalAppLogo(logoData) {
     if (!logoData) return; 
     const targets = document.querySelectorAll('.app-logo-render-target'); 
@@ -601,24 +588,24 @@ function updateNetworkStatus(statusType, errorMessage = '') {
   if(!dot || !text) return;
   
   if(statusType === 'online') {
-    dot.className = "w-1.5 h-1.5 rounded-full bg-ios-green animate-pulseGlow shadow-[0_0_8px_#32D74B]";
+    dot.className = "w-2 h-2 rounded-full bg-ios-green animate-pulseGlow shadow-[0_0_10px_#32D74B]";
     text.innerText = "Online";
-    text.className = "text-[9.5px] text-ios-green font-bold tracking-tight drop-shadow-sm";
+    text.className = "text-[10px] text-ios-green font-bold tracking-tight drop-shadow-sm";
     appWrap.classList.remove('sync-mode-active');
   } else if(statusType === 'syncing') {
-    dot.className = "w-1.5 h-1.5 rounded-full bg-ios-blue animate-syncWave shadow-[0_0_8px_#0A84FF]";
+    dot.className = "w-2 h-2 rounded-full bg-ios-blue animate-syncWave shadow-[0_0_10px_#0A84FF]";
     text.innerText = "Menyelaraskan...";
-    text.className = "text-[9.5px] text-ios-blue font-bold tracking-tight drop-shadow-sm";
+    text.className = "text-[10px] text-ios-blue font-bold tracking-tight drop-shadow-sm";
     appWrap.classList.add('sync-mode-active');
   } else if(statusType === 'connecting') {
-    dot.className = "w-1.5 h-1.5 rounded-full bg-ios-orange animate-spinFast shadow-[0_0_8px_#FF9F0A]";
+    dot.className = "w-2 h-2 rounded-full bg-ios-orange animate-spinFast shadow-[0_0_10px_#FF9F0A]";
     text.innerText = "Menghubungkan...";
-    text.className = "text-[9.5px] text-ios-orange font-bold tracking-tight drop-shadow-sm";
+    text.className = "text-[10px] text-ios-orange font-bold tracking-tight drop-shadow-sm";
     appWrap.classList.remove('sync-mode-active');
-  } else { 
-    dot.className = "w-1.5 h-1.5 rounded-full bg-ios-red shadow-[0_0_8px_#FF453A]";
+  } else {
+    dot.className = "w-2 h-2 rounded-full bg-ios-red shadow-[0_0_8px_#FF453A]";
     text.innerText = "Offline";
-    text.className = "text-[9.5px] text-ios-red font-bold tracking-tight drop-shadow-sm";
+    text.className = "text-[10px] text-ios-red font-bold tracking-tight drop-shadow-sm";
     appWrap.classList.remove('sync-mode-active');
     if (errorMessage) showToast(errorMessage, 'error');
   }
@@ -734,8 +721,12 @@ async function checkAndSeedInitialData() {
 }
 
 function handleLogin() {
-  const u = String(document.getElementById('login-username').value).trim().toLowerCase();
-  const p = String(document.getElementById('login-password').value).trim();
+  const uInput = document.getElementById('login-username');
+  const pInput = document.getElementById('login-password');
+  if (!uInput || !pInput) return false;
+
+  const u = String(uInput.value).trim().toLowerCase();
+  const p = String(pInput.value).trim();
   const errEl = document.getElementById('login-error');
   if (!u || !p) return false;
 
@@ -743,7 +734,8 @@ function handleLogin() {
   if(!user && u === 'admin' && p === '123') user = { id: 'U-1', username: 'admin', password: '123', role: 'Admin' };
 
   if (user) {
-    appState.currentUser = user; errEl.classList.add('hidden');
+    appState.currentUser = user; 
+    if (errEl) errEl.classList.add('hidden');
     document.getElementById('login-view').classList.add('hidden');
     document.getElementById('app-wrapper').classList.remove('hidden');
     
@@ -753,16 +745,23 @@ function handleLogin() {
     if (user.role === 'Admin') document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden', '!hidden'));
     else document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden', '!hidden'));
     
-    switchTab('dashboard'); showToast(`Selamat datang!`, 'success');
+    switchTab('dashboard'); 
+    showToast(`Selamat datang!`, 'success');
   } else {
-    errEl.innerText = "Sandi atau Username salah"; errEl.classList.remove('hidden');
+    if (errEl) {
+      errEl.innerText = "Sandi atau Username salah"; 
+      errEl.classList.remove('hidden');
+    }
   }
+  return false;
 }
+window.handleLogin = handleLogin;
 
 function handleLogout() {
   appState.currentUser = null; document.getElementById('app-wrapper').classList.add('hidden');
   document.getElementById('login-view').classList.remove('hidden'); document.getElementById('login-form').reset();
 }
+window.handleLogout = handleLogout;
 
 let activeTab = 'dashboard';
 function switchTab(tabId) {
@@ -913,7 +912,7 @@ function updateBulkPayBtn() {
 
 function executeDashboardBulkPay() {
   const boxes = document.querySelectorAll('.unpaid-cb:checked'); if(boxes.length === 0) return showToast('Pilih min. 1 anggota', 'error');
-  const today = getLocalDateString(); if (isYearLocked(today)) return showToast('Tahun transaksi ini dikunci!', 'error');
+  const today = new Date().toISOString().split('T')[0]; if (isYearLocked(today)) return showToast('Tahun transaksi ini dikunci!', 'error');
   let cCat = appState.categories.find(c => c.type === 'Pemasukan' && isIuran(c.name))?.name || 'Iuran Bulanan';
   
   boxes.forEach(cb => {
@@ -1275,7 +1274,7 @@ function renderReports() {
 }
 
 function generateWhatsAppMessageText(customUrl = '') {
-  const m = document.getElementById('report-month').value, y = document.getElementById('report-year').value; const tStr = getLocalDateString(); const dStr = formatDateIndo(tStr); const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; const mIdx = parseInt(m, 10) - 1; const currentMonthName = mn[mIdx]; let prevMonthIdx = mIdx - 1; let prevYearStr = y; if (prevMonthIdx < 0) { prevMonthIdx = 11; prevYearStr = (parseInt(y, 10) - 1).toString(); }
+  const m = document.getElementById('report-month').value, y = document.getElementById('report-year').value; const t = new Date(); const dStr = formatDateIndo(t.toISOString().split('T')[0]); const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; const mIdx = parseInt(m, 10) - 1; const currentMonthName = mn[mIdx]; let prevMonthIdx = mIdx - 1; let prevYearStr = y; if (prevMonthIdx < 0) { prevMonthIdx = 11; prevYearStr = (parseInt(y, 10) - 1).toString(); }
   
   let txt = `*REKAP KEUANGAN PAGUYUBAN*\n_Per: ${dStr}_\n------------------------\n\n`;
   txt += `💼 Saldo Akhir ${mn[prevMonthIdx]} ${prevYearStr}: ${document.getElementById('report-prev-balance').innerText}\n📈 Pemasukan ${currentMonthName}: ${document.getElementById('report-in').innerText}\n📉 Pengeluaran ${currentMonthName}: ${document.getElementById('report-out').innerText}\n💰 *KAS AKTIF: ${document.getElementById('report-net').innerText}*\n\n`;
@@ -1299,4 +1298,7 @@ function generateWhatsAppMembersStatusText() {
     let paid = false; if(lastYM) { const targetValue = targetYear * 12 + targetMonth; const lastPaidValue = lastYM.year * 12 + lastYM.month; paid = lastPaidValue >= targetValue; }
     if (paid) { paidCount++; memberLines.push(`✅ ${mbr.name}`); } else { unpaidCount++; memberLines.push(`❌ ${mbr.name}`); }
   });
-  let txt = `*STATUS IURAN ANGGOTA*\n*Periode: ${mn[targetMonth-1]} ${y}*\n------------------\n\n`; txt += memberLines.join('\n') + `\n\n------------------\n`; txt += `📊 *Ringkasan:* \n✅ Luna
+  let txt = `*STATUS IURAN ANGGOTA*\n*Periode: ${mn[targetMonth-1]} ${y}*\n------------------\n\n`; txt += memberLines.join('\n') + `\n\n------------------\n`; txt += `📊 *Ringkasan:* \n✅ Lunas: ${paidCount}\n❌ Belum: ${unpaidCount}\nTotal: ${sortedMembers.length}\n\n`; txt += `bagi yang sudah transfer tapi belum tercatat mohon konfirmasi ke admin untuk dilakukan kroscek. 🙏\n_~ Admin_`; return txt;
+}
+
+function openWhatsAppPrevi
