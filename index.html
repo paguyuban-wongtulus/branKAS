@@ -3,15 +3,17 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>branKAS - Paguyuban Wongtulus</title>
 
-<!-- Fonts & Frameworks -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -19,942 +21,696 @@
   tailwind.config = {
     theme: {
       extend: {
-        fontFamily: { sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'sans-serif'], },
+        fontFamily: { sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'sans-serif'], },
         colors: {
           ios: { bg: '#000000', card: '#1C1C1E', blue: '#0A84FF', indigo: '#5E5CE6', green: '#32D74B', red: '#FF453A', orange: '#FF9F0A', teal: '#64D2FF', gray: '#8E8E93' }
         },
-        animation: { float: 'float 5s ease-in-out infinite', },
-        keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-4px)' }, } }
+        animation: { 
+          float: 'float 5s ease-in-out infinite',
+          pulseGlow: 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          spinFast: 'spin 1s linear infinite',
+          syncWave: 'syncWave 1.5s ease-in-out infinite'
+        },
+        keyframes: { 
+          float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-4px)' } },
+          pulseGlow: { '0%, 100%': { opacity: 1, transform: 'scale(1)' }, '50%': { opacity: 0.35, transform: 'scale(0.8)' } },
+          syncWave: { '0%, 100%': { opacity: 0.4, transform: 'scale(0.95)' }, '50%': { opacity: 1, transform: 'scale(1.1)' } }
+        }
       }
     }
   }
 </script>
 
 <style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
-  body { background-color: #000000; color: #FFFFFF; overflow-x: hidden; overscroll-behavior-y: none; font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; -webkit-touch-callout: none; }
+  
+  body, html { 
+    background-color: #000000; color: #FFFFFF; 
+    width: 100vw; height: 100vh; height: 100dvh; 
+    overflow: hidden; overscroll-behavior-y: none; 
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif; 
+    margin: 0; padding: 0; -webkit-user-select: none; user-select: none;
+  }
+
+  @supports (-webkit-touch-callout: none) {
+    body, html { height: -webkit-fill-available; }
+  }
 
   #app-wrapper {
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
     transform-origin: top center; background-color: #000000;
   }
-  #app-wrapper.modal-active { transform: scale(0.94) translateY(max(env(safe-area-inset-top), 8px)); border-radius: 32px; overflow: hidden; opacity: 0.5; pointer-events: none; }
+  #app-wrapper.modal-active { transform: scale(0.94) translateY(max(env(safe-area-inset-top), 8px)); border-radius: 28px; overflow: hidden; opacity: 0.5; pointer-events: none; }
   
-  .ios-glass { background: rgba(28, 28, 30, 0.75); backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%); border: 0.5px solid rgba(255, 255, 255, 0.12); }
-  .ios-cc-module { background: rgba(28, 28, 30, 0.8); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%); border-radius: 24px; border: 0.5px solid rgba(255, 255, 255, 0.14); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-  .blur-header { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%); border-bottom: 0.5px solid rgba(255, 255, 255, 0.08); }
+  .ios-cc-module { background: rgba(28, 28, 30, 0.8); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%); border-radius: 20px; border: 0.5px solid rgba(255, 255, 255, 0.14); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+  .blur-header { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%); border-bottom: 0.5px solid rgba(255, 255, 255, 0.08); padding-top: max(env(safe-area-inset-top), 6px); }
   
-  .floating-nav { background: rgba(28, 28, 30, 0.92); backdrop-filter: blur(40px) saturate(220%); -webkit-backdrop-filter: blur(40px) saturate(220%); border: 0.5px solid rgba(255, 255, 255, 0.18); box-shadow: 0 20px 45px rgba(0,0,0,0.85); border-radius: 99px; }
+  .floating-nav { background: rgba(28, 28, 30, 0.92); backdrop-filter: blur(40px) saturate(220%); -webkit-backdrop-filter: blur(40px) saturate(220%); border: 0.5px solid rgba(255, 255, 255, 0.18); box-shadow: 0 15px 35px rgba(0,0,0,0.85); border-radius: 99px; }
   
-  .ios-list { background-color: rgba(28, 28, 30, 0.65); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border-radius: 20px; overflow: hidden; border: 0.5px solid rgba(255, 255, 255, 0.12); }
-  .ios-list-item { display: flex; align-items: center; padding: 12px 14px; transition: background-color 0.2s ease; cursor: pointer; }
+  .ios-list { background-color: rgba(28, 28, 30, 0.65); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border-radius: 16px; overflow: hidden; border: 0.5px solid rgba(255, 255, 255, 0.12); }
+  .ios-list-item { display: flex; align-items: center; padding: 10px 12px; transition: background-color 0.2s ease; cursor: pointer; }
   .ios-list-item:active { background-color: rgba(255, 255, 255, 0.12); }
   .ios-list-item:not(:last-child) .ios-list-content { border-bottom: 0.5px solid rgba(255, 255, 255, 0.08); }
-  .ios-list-content { flex: 1; display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; margin-bottom: -12px; }
+  .ios-list-content { flex: 1; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: -10px; }
   
-  ::-webkit-scrollbar { width: 0px; background: transparent; }
+  ::-webkit-scrollbar { width: 0px; display: none; background: transparent; }
   
-  @keyframes tabEnter { 0% { opacity: 0; transform: translateY(12px) scale(0.99); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-  .tab-enter { animation: tabEnter 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards; will-change: transform, opacity; }
-  .active-spring { transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease; touch-action: manipulation; }
-  .active-spring:active { transform: scale(0.93); opacity: 0.8; }
+  @keyframes tabEnter { 0% { opacity: 0; transform: translateY(8px) scale(0.99); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+  .tab-enter { animation: tabEnter 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards; will-change: transform, opacity; }
+  .active-spring { transition: transform 0.15s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s ease; touch-action: manipulation; }
+  .active-spring:active { transform: scale(0.92); opacity: 0.8; }
   
-  input, select, textarea { font-size: 16px !important; background: transparent; color-scheme: dark; font-family: -apple-system, sans-serif; }
-  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem; padding-right: 2rem !important; }
-  .ios-input { background: rgba(255, 255, 255, 0.07); border-radius: 16px; padding: 9px 12px; width: 100%; border: 1px solid rgba(255, 255, 255, 0.06); transition: all 0.3s ease; color: white; }
-  .ios-input:focus { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.25); outline: none; box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25); }
+  /* Fix Checkbox Appearance Safari/iOS */
+  input:not([type="checkbox"]), select, textarea, button { 
+    -webkit-appearance: none; appearance: none; outline: none;
+    font-size: 16px !important; font-family: -apple-system, sans-serif; background: transparent; 
+  }
+  input[type="checkbox"] {
+    -webkit-appearance: checkbox !important; appearance: checkbox !important; cursor: pointer; outline: none;
+  }
   
-  .modal-sheet { transform: translate3d(0, 100%, 0); transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1); overscroll-behavior-y: contain; will-change: transform; padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+  .ios-input { background: rgba(255, 255, 255, 0.07); border-radius: 12px; padding: 6px 10px; width: 100%; border: 1px solid rgba(255, 255, 255, 0.06); transition: all 0.3s ease; color: white; line-height: 1.2; -webkit-user-select: text; user-select: text; }
+  .ios-input:focus { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.25); box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.25); }
+  
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 0.9rem; padding-right: 1.5rem !important; }
+  
+  .modal-sheet { transform: translate3d(0, 100%, 0); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); overscroll-behavior-y: contain; will-change: transform; padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
   .modal-sheet.open { transform: translate3d(0, 0, 0); }
   
   .toast-pill {
-    position: fixed; top: env(safe-area-inset-top, 10px); left: 50%;
-    transform: translate3d(-50%, -20px, 0) scale(0.9);
-    background: #000000;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.8);
-    border-radius: 999px; z-index: 99999; display: flex; align-items: center; gap: 8px;
-    padding: 6px 14px; transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
-    opacity: 0; pointer-events: none;
+    position: fixed; top: env(safe-area-inset-top, 10px); left: 50%; transform: translate3d(-50%, -20px, 0) scale(0.9);
+    background: #000000; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+    border-radius: 999px; z-index: 99999; display: flex; align-items: center; gap: 6px; padding: 5px 12px;
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.35s ease; opacity: 0; pointer-events: none;
   }
   .toast-pill.show { transform: translate3d(-50%, 0, 0) scale(1); opacity: 1; }
   .toast-pill.hide { transform: translate3d(-50%, -20px, 0) scale(0.9); opacity: 0; }
   
-  @keyframes slideUpFade { 0% { opacity: 0; transform: translate3d(0, 14px, 0); } 15%, 85% { opacity: 1; transform: translate3d(0, 0, 0); } 100% { opacity: 0; transform: translate3d(0, -14px, 0); } }
+  @keyframes slideUpFade { 0% { opacity: 0; transform: translate3d(0, 10px, 0); } 15%, 85% { opacity: 1; transform: translate3d(0, 0, 0); } 100% { opacity: 0; transform: translate3d(0, -10px, 0); } }
   .animate-slide-up-fade { animation: slideUpFade 4s cubic-bezier(0.32, 0.72, 0, 1) infinite; will-change: transform, opacity; }
+
+  /* Offline syncing subtle animation */
+  @keyframes bgPulseSync { 0%, 100% { background-color: rgba(10, 132, 255, 0); } 50% { background-color: rgba(10, 132, 255, 0.05); } }
+  .sync-mode-active { animation: bgPulseSync 2s ease-in-out infinite; }
 </style>
-</head>
 
-<body class="w-full h-[100dvh] flex flex-col justify-between text-white bg-black">
-
-<!-- Fail-Safe Global Loader: Akan hilang maksimal dalam 1.2 detik -->
-<div id="loading-overlay" class="fixed inset-0 z-[99999] bg-[#000000] flex flex-col items-center justify-center transition-opacity duration-300">
-  <div class="relative flex justify-center items-center">
-    <div class="w-14 h-14 border-4 border-white/10 border-t-ios-blue rounded-full animate-spin"></div>
-    <div class="app-logo-render-target w-6 h-6 absolute text-ios-blue flex items-center justify-center text-lg">
-      <i class="fa-solid fa-vault"></i>
-    </div>
-  </div>
-  <p id="loading-text" class="text-white/50 font-semibold text-[11px] mt-4 tracking-[0.2em] uppercase">Memuat sistem branKAS...</p>
-</div>
-
-<!-- Penjamin Loader Eksternal (Menghentikan Loader apa pun yang terjadi) -->
+<!-- Pre-fetch logo from local cache to prevent flashing -->
 <script>
-  setTimeout(() => {
-    const el = document.getElementById('loading-overlay');
-    if (el && el.style.display !== 'none') {
-      el.style.opacity = '0';
-      setTimeout(() => el.style.display = 'none', 300);
+  window.__initialLogoCache = null;
+  try {
+    const cached = localStorage.getItem('brankas_v20_scalable_app');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      const logoSet = (parsed.settings || []).find(s => s.key === 'app_logo');
+      if (logoSet) window.__initialLogoCache = logoSet;
     }
-  }, 1200);
+  } catch(e) {}
 </script>
 
-<!-- Dynamic Island Toast -->
-<div id="dynamic-island-toast" class="toast-pill">
-  <div id="toast-icon" class="flex items-center justify-center w-5 h-5 rounded-full shrink-0"></div>
-  <span id="toast-message" class="text-[13px] font-semibold text-white tracking-tight"></span>
+</head>
+
+<body class="text-[13px]">
+
+<div id="loading-overlay" class="fixed inset-0 z-[99999] bg-[#000000] flex flex-col items-center justify-center transition-opacity duration-300">
+  <div class="relative flex justify-center items-center">
+    <div class="w-12 h-12 border-[3px] border-white/10 border-t-ios-blue rounded-full animate-spin"></div>
+    <div class="app-logo-render-target w-5 h-5 absolute text-ios-blue flex items-center justify-center text-base"><i class="fa-solid fa-vault"></i></div>
+  </div>
 </div>
 
-<!-- Login View -->
-<div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#000000] w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-ios-blue/15 via-[#000000] to-[#000000]">
+<div id="dynamic-island-toast" class="toast-pill">
+  <div id="toast-icon" class="flex items-center justify-center w-4 h-4 rounded-full shrink-0"></div>
+  <span id="toast-message" class="text-[11px] font-semibold text-white tracking-tight"></span>
+</div>
+
+<div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-4 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-ios-blue/15 via-[#000000] to-[#000000]">
   <div class="w-full max-w-xs flex flex-col items-center animate-float">
-    <div id="login-logo-box" class="w-20 h-20 rounded-[26px] bg-gradient-to-br from-ios-blue to-blue-700 flex items-center justify-center text-white text-3xl mb-4 ring-1 ring-white/20 shrink-0 shadow-[0_12px_30px_rgba(10,132,255,0.4)] overflow-hidden relative">
-      <div class="app-logo-render-target flex items-center justify-center w-full h-full">
-        <i class="fa-solid fa-vault"></i>
-      </div>
+    <div id="login-logo-box" class="w-16 h-16 rounded-[22px] bg-gradient-to-br from-ios-blue to-blue-700 flex items-center justify-center text-white text-2xl mb-3 ring-1 ring-white/20 shrink-0 shadow-[0_10px_25px_rgba(10,132,255,0.4)] overflow-hidden relative">
+      <div class="app-logo-render-target flex items-center justify-center w-full h-full"><i class="fa-solid fa-vault"></i></div>
     </div>
-    <h1 class="text-[30px] font-bold tracking-tight mb-0.5 text-white">branKAS</h1>
-    <p class="text-white/40 text-center text-[10px] mb-6 font-semibold uppercase tracking-[0.2em] flex items-center gap-2">
-      <span class="w-3 h-[1px] bg-white/20"></span>
-      Paguyuban Wongtulus
-      <span class="w-3 h-[1px] bg-white/20"></span>
+    <h1 class="text-[26px] font-bold tracking-tight mb-0.5 text-white">branKAS</h1>
+    <p class="text-white/40 text-center text-[9px] mb-5 font-semibold uppercase tracking-[0.2em] flex items-center gap-2">
+      <span class="w-3 h-[1px] bg-white/20"></span> Paguyuban Wongtulus <span class="w-3 h-[1px] bg-white/20"></span>
     </p>
 
-    <!-- FORM LOGIN: Menggunakan onsubmit="event.preventDefault()" untuk cegah Reload! -->
-    <form id="login-form" onsubmit="event.preventDefault();" class="w-full space-y-3.5">
-      <div class="ios-list shadow-xl bg-[#1C1C1E]/80 backdrop-blur-2xl">
-        <div class="flex items-center px-4 py-2 border-b border-white/10">
-          <div class="w-6 flex justify-center text-white/40 shrink-0 text-xs"><i class="fa-solid fa-user"></i></div>
-          <input type="text" id="login-username" required class="w-full bg-transparent text-white font-medium placeholder-white/35 focus:outline-none h-9 text-[15px]" placeholder="Username">
+    <form id="login-form" class="w-full space-y-2.5" onsubmit="event.preventDefault();">
+      <div class="ios-list shadow-xl bg-[#1C1C1E]/85 backdrop-blur-2xl !rounded-[14px]">
+        <div class="flex items-center px-3 py-1 border-b border-white/10">
+          <div class="w-5 flex justify-center text-white/40 shrink-0 text-[10px]"><i class="fa-solid fa-user"></i></div>
+          <input type="text" id="login-username" required class="w-full bg-transparent text-white font-medium placeholder-white/35 focus:outline-none h-8 text-[16px] leading-normal" placeholder="Username" autocapitalize="none" autocomplete="off">
         </div>
-        <div class="flex items-center px-4 py-2">
-          <div class="w-6 flex justify-center text-white/40 shrink-0 text-xs"><i class="fa-solid fa-lock"></i></div>
-          <input type="password" id="login-password" required class="w-full bg-transparent text-white font-medium placeholder-white/35 focus:outline-none h-9 text-[15px]" placeholder="Password">
+        <div class="flex items-center px-3 py-1">
+          <div class="w-5 flex justify-center text-white/40 shrink-0 text-[10px]"><i class="fa-solid fa-lock"></i></div>
+          <input type="password" id="login-password" required class="w-full bg-transparent text-white font-medium placeholder-white/35 focus:outline-none h-8 text-[16px] leading-normal" placeholder="Password">
         </div>
       </div>
-      <div id="login-error" class="hidden text-[12px] text-ios-red text-center font-medium px-3 py-2 bg-ios-red/10 rounded-xl border border-ios-red/20"></div>
-      <button type="submit" id="btn-login-submit" class="w-full py-3 rounded-[18px] bg-ios-blue text-white font-semibold text-[15px] active-spring shadow-[0_8px_20px_rgba(10,132,255,0.35)]">
-        Masuk Sistem
-      </button>
+      <div id="login-error" class="hidden text-[11px] text-ios-red text-center font-medium px-2 py-1 bg-ios-red/10 rounded-[10px] border border-ios-red/20"></div>
+      <button type="submit" id="btn-submit-login" class="w-full py-2.5 rounded-[14px] bg-ios-blue text-white font-semibold text-[14px] active-spring shadow-[0_6px_15px_rgba(10,132,255,0.35)]">Masuk Sistem</button>
     </form>
   </div>
 </div>
 
-<!-- Main App Wrapper -->
-<div id="app-wrapper" class="w-full h-full flex flex-col hidden relative items-center">
-  <header class="fixed top-0 left-0 right-0 z-40 blur-header px-3 py-2 flex items-center justify-center shadow-md">
+<div id="app-wrapper" class="w-full h-full flex flex-col hidden relative items-center overflow-hidden">
+  <header class="absolute top-0 left-0 right-0 z-40 blur-header px-3 pb-2 flex items-center justify-center shadow-md w-full">
     <div class="w-full max-w-md flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <div id="header-logo-box" class="w-8 h-8 rounded-[10px] bg-gradient-to-br from-ios-blue to-blue-600 flex items-center justify-center text-white shadow-md overflow-hidden relative border border-white/15 shrink-0">
-          <div class="app-logo-render-target flex items-center justify-center w-full h-full text-[15px]">
-            <i class="fa-solid fa-vault"></i>
-          </div>
+        <div id="header-logo-box" class="w-7 h-7 rounded-[8px] bg-gradient-to-br from-ios-blue to-blue-600 flex items-center justify-center text-white shadow-sm overflow-hidden relative border border-white/15 shrink-0">
+          <div class="app-logo-render-target flex items-center justify-center w-full h-full text-[13px]"><i class="fa-solid fa-vault"></i></div>
         </div>
         
         <div class="flex flex-col justify-center">
-          <div class="flex items-center gap-1.5 leading-none">
-            <span class="font-bold text-[16px] tracking-tight text-white">branKAS</span>
-            <div id="firebase-status-badge" class="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-ios-orange/15 border border-ios-orange/30 text-ios-orange text-[8px] font-bold uppercase tracking-wider shrink-0 transition-all duration-300">
-              <span id="firebase-status-dot" class="w-1.5 h-1.5 rounded-full bg-ios-orange animate-ping"></span>
-              <span id="firebase-status-text">Connecting</span>
+          <div class="flex items-center gap-2 leading-none">
+            <span class="font-bold text-[15px] tracking-tight text-white">branKAS</span>
+            <div class="flex items-center gap-1.5 ml-1" id="network-indicator">
+              <span id="firebase-status-dot" class="w-2 h-2 rounded-full bg-ios-orange animate-spinFast shadow-[0_0_10px_#FF9F0A]"></span>
+              <span id="firebase-status-text" class="text-[10px] text-white/70 font-semibold tracking-tight">Menghubungkan...</span>
             </div>
           </div>
-          <span class="text-[9px] text-white/50 font-semibold tracking-wider uppercase mt-1 leading-none">Paguyuban Wongtulus</span>
+          <span class="text-[8px] text-white/50 font-semibold tracking-wider uppercase mt-1 leading-none">Wongtulus</span>
         </div>
       </div>
       
       <div class="flex items-center gap-1.5">
-        <button id="header-logout-btn" class="w-8 h-8 rounded-full bg-ios-red/15 border border-ios-red/25 flex items-center justify-center text-ios-red hover:bg-ios-red/25 active-spring shrink-0 text-xs" title="Keluar">
+        <button id="header-settings-btn" class="hidden admin-only w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/25 active-spring shrink-0 text-[10px]" title="Pengaturan">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+        <button id="header-logout-btn" class="w-7 h-7 rounded-full bg-ios-red/15 border border-ios-red/25 flex items-center justify-center text-ios-red hover:bg-ios-red/25 active-spring shrink-0 text-[10px]" title="Keluar">
           <i class="fa-solid fa-power-off"></i>
         </button>
       </div>
     </div>
   </header>
 
-  <div class="flex flex-1 w-full pt-[52px] pb-[76px] h-full justify-center">
-    <main class="flex-1 w-full max-w-md overflow-y-auto overscroll-y-contain scroll-smooth p-3 relative [-webkit-overflow-scrolling:touch] transform-gpu">
+  <div class="flex flex-1 w-full pt-[calc(max(env(safe-area-inset-top),6px)+42px)] h-full justify-center overflow-hidden relative z-10">
+    <main class="flex-1 w-full max-w-md h-full overflow-y-auto overscroll-y-contain scroll-smooth p-2.5 pb-[calc(76px+max(10px,env(safe-area-inset-bottom)))] [-webkit-overflow-scrolling:touch] transform-gpu">
       
-      <!-- DASHBOARD TAB -->
-      <div id="tab-dashboard" class="tab-content tab-enter space-y-3 pb-4">
+      <!-- TAB DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content tab-enter space-y-2">
         <div class="flex justify-between items-baseline px-0.5">
           <div>
-            <h2 class="text-[22px] font-bold tracking-tight text-white leading-tight" id="dash-greeting-label">Halo</h2>
-            <p class="text-white/40 text-[10px] font-semibold tracking-wide" id="dash-date-label">Memuat...</p>
+            <h2 class="text-[17px] font-bold tracking-tight text-white leading-tight" id="dash-greeting-label">Halo</h2>
+            <p class="text-white/40 text-[9px] font-semibold tracking-wide" id="dash-date-label">Memuat...</p>
           </div>
         </div>
 
-        <div class="ios-cc-module p-4 relative flex flex-col justify-between overflow-hidden shadow-md cursor-default">
-           <div class="absolute -top-8 -right-8 w-48 h-48 bg-ios-blue/25 rounded-full blur-[45px] pointer-events-none"></div>
-           
-           <div class="flex flex-col items-center z-10 w-full mb-2">
-             <span class="text-white/50 font-semibold text-[10px] uppercase tracking-widest mb-0.5">Total Kas Aktif</span>
-             <div id="stat-total-kas" class="text-[30px] font-bold tracking-tight text-white leading-none drop-shadow-sm truncate text-center w-full">Rp 0</div>
+        <div class="ios-cc-module p-3 relative flex flex-col justify-between overflow-hidden shadow-sm cursor-default">
+           <div class="absolute -top-8 -right-8 w-40 h-40 bg-ios-blue/20 rounded-full blur-[40px] pointer-events-none"></div>
+           <div class="flex flex-col items-center z-10 w-full mb-1">
+             <span class="text-white/50 font-semibold text-[9px] uppercase tracking-widest mb-0.5">Total Kas Aktif</span>
+             <div id="stat-total-kas" class="text-[22px] font-bold tracking-tight text-white leading-none drop-shadow-sm truncate text-center w-full">Rp 0</div>
            </div>
-           
-           <div class="w-full h-px bg-white/10 my-1.5 z-10"></div>
-           
+           <div class="w-full h-px bg-white/10 my-1 z-10"></div>
            <div class="flex justify-between items-center z-10 pt-0.5">
              <div class="flex-1 flex flex-col items-start pr-2 border-r border-white/10">
-               <div class="flex items-center gap-1 mb-0.5">
-                  <i class="fa-solid fa-arrow-down text-ios-green text-[9px]"></i>
-                  <span class="text-white/40 font-semibold text-[9px] uppercase tracking-wider">Masuk</span>
-               </div>
-               <div id="stat-in-month" class="text-[14px] font-bold text-white truncate w-full">Rp 0</div>
+               <div class="flex items-center gap-1 mb-0.5"><i class="fa-solid fa-arrow-down text-ios-green text-[8px]"></i><span class="text-white/40 font-semibold text-[8px] uppercase tracking-wider ml-1">Masuk bln ini</span></div>
+               <div id="stat-in-month" class="text-[11px] font-bold text-white truncate w-full">Rp 0</div>
              </div>
-             <div class="flex-1 flex flex-col items-start pl-3">
-               <div class="flex items-center gap-1 mb-0.5">
-                  <i class="fa-solid fa-arrow-up text-ios-red text-[9px]"></i>
-                  <span class="text-white/40 font-semibold text-[9px] uppercase tracking-wider">Keluar</span>
-               </div>
-               <div id="stat-out-month" class="text-[14px] font-bold text-white truncate w-full">Rp 0</div>
+             <div class="flex-1 flex flex-col items-start pl-2">
+               <div class="flex items-center gap-1 mb-0.5"><i class="fa-solid fa-arrow-up text-ios-red text-[8px]"></i><span class="text-white/40 font-semibold text-[8px] uppercase tracking-wider ml-1">Keluar bln ini</span></div>
+               <div id="stat-out-month" class="text-[11px] font-bold text-white truncate w-full">Rp 0</div>
              </div>
            </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-3 pt-1">
+        <div class="grid grid-cols-1 gap-2 pt-0.5">
           <div class="col-span-1">
-            <div class="flex items-center justify-between mb-1.5 px-1">
-              <h3 class="text-[11px] font-semibold tracking-widest text-white/50 uppercase">Belum Bayar Iuran</h3>
-              <span id="badge-unpaid-month" class="bg-white/10 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10">0</span>
+            <div class="flex items-center justify-between mb-1 px-1">
+              <h3 class="text-[10px] font-semibold tracking-widest text-white/50 uppercase">Belum Bayar Iuran</h3>
+              <span id="badge-unpaid-month" class="bg-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-white/10">0</span>
             </div>
-            <div class="ios-list max-h-[200px] overflow-y-auto shadow-md bg-[#1C1C1E]/80">
-              <div id="list-unpaid-month" class="flex flex-col"></div>
+            <div class="ios-list max-h-[160px] overflow-y-auto shadow-sm bg-[#1C1C1E]/80">
+              <div id="list-unpaid-month" class="flex flex-col divide-y divide-white/5"></div>
             </div>
-            <div id="bulk-pay-action-container" class="mt-2 hidden admin-only">
-              <button id="btn-execute-bulk-pay" class="w-full bg-ios-blue text-white py-2.5 rounded-[14px] font-semibold text-[13px] active-spring shadow flex justify-center items-center">
-                <i class="fa-solid fa-check-double mr-1.5"></i> <span id="bulk-pay-btn-text" class="truncate">Tandai Lunas Terpilih</span>
+            <div id="bulk-pay-action-container" class="mt-1.5 hidden admin-only">
+              <button id="btn-execute-bulk-pay" type="button" class="w-full bg-ios-blue text-white py-2 rounded-[12px] font-semibold text-[11px] active-spring flex justify-center items-center shadow">
+                <i class="fa-solid fa-check-double mr-1.5"></i> <span id="bulk-pay-btn-text" class="truncate">Lunasi Terpilih</span>
               </button>
             </div>
           </div>
 
           <div class="col-span-1">
-            <div class="flex items-center justify-between mb-1.5 px-1">
-              <h3 class="text-[11px] font-semibold tracking-widest text-white/50 uppercase">Aktivitas Terakhir</h3>
-              <button id="btn-see-all-tx" class="text-ios-blue text-[12px] font-medium active-spring">Lihat Semua</button>
+            <div class="flex items-center justify-between mb-1 px-1">
+              <h3 class="text-[10px] font-semibold tracking-widest text-white/50 uppercase">Aktivitas Terakhir</h3>
+              <button id="btn-see-all-tx" type="button" class="text-ios-blue text-[10px] font-semibold active-spring">Semua</button>
             </div>
-            <div class="ios-list shadow-md overflow-hidden relative h-[68px] bg-[#1C1C1E]/80">
+            <div class="ios-list shadow-sm overflow-hidden relative h-[48px] bg-[#1C1C1E]/80">
               <div id="recent-activity-slider" class="absolute inset-0 flex flex-col w-full h-full"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TRANSACTIONS TAB -->
-      <div id="tab-transactions" class="tab-content hidden space-y-3 pb-8">
-        <div class="flex items-center justify-between px-0.5">
-          <h2 class="text-[24px] font-bold tracking-tight">Transaksi</h2>
-        </div>
-
-        <div class="flex gap-2">
-          <div class="relative flex-1">
-            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-white/40">
-              <i class="fa-solid fa-magnifying-glass text-xs"></i>
-            </div>
-            <input type="text" id="search-transactions" class="ios-input pl-8 h-9 bg-white/10 text-[13px]" placeholder="Cari transaksi...">
+      <!-- TAB TRANSACTIONS -->
+      <div id="tab-transactions" class="tab-content hidden space-y-2">
+        <div class="flex items-center justify-between px-0.5"><h2 class="text-[17px] font-bold tracking-tight">Transaksi</h2></div>
+        <div class="flex gap-1.5 w-full">
+          <div class="relative flex-1 min-w-0">
+            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-white/40"><i class="fa-solid fa-magnifying-glass text-[10px]"></i></div>
+            <input type="text" id="search-transactions" class="ios-input pl-7 h-8 bg-white/10 text-[15px]" placeholder="Cari...">
           </div>
-          <input type="month" id="filter-tx-month" class="ios-input w-32 shrink-0 h-9 bg-white/10 px-2 text-[12px]">
+          <input type="month" id="filter-tx-month" class="ios-input w-[125px] shrink-0 h-8 bg-white/10 px-2 text-[15px]">
         </div>
 
-        <div id="bulk-delete-btn-container" class="hidden">
-           <button id="bulk-delete-btn" class="admin-only w-full h-9 px-3 bg-ios-red/15 rounded-[12px] text-[13px] font-medium text-ios-red active-spring flex justify-center items-center gap-1.5"><i class="fa-solid fa-trash"></i> Hapus Terpilih</button>
+        <div id="bulk-delete-btn-container" class="hidden mb-1">
+           <button id="bulk-delete-btn" type="button" class="admin-only w-full h-9 px-2 bg-ios-red/15 rounded-[10px] text-[12px] font-semibold text-ios-red active-spring flex justify-center items-center gap-1.5"><i class="fa-solid fa-trash"></i> Hapus Terpilih</button>
         </div>
 
-        <div class="ios-list shadow-md bg-[#1C1C1E]/80">
-          <div class="flex items-center px-3 py-1.5 border-b border-white/10 bg-white/5 text-[10px] font-semibold text-white/50 admin-only">
-            <input type="checkbox" id="select-all-tx" class="w-3.5 h-3.5 rounded border-white/20 mr-2 accent-ios-blue shrink-0 cursor-pointer">
-            Pilih Semua
-          </div>
-          <div id="list-transactions-view" class="divide-y divide-white/10"></div>
-          
+        <div class="ios-list shadow-sm bg-[#1C1C1E]/80">
+          <div id="list-transactions-view" class="divide-y divide-white/10 relative"></div>
           <div id="load-more-tx-container" class="hidden border-t border-white/10">
-             <button id="btn-load-more-tx" class="w-full py-3 text-[12px] font-semibold text-ios-blue active-spring">Lihat Lebih Banyak <span id="load-more-count"></span></button>
+             <button id="btn-load-more-tx" type="button" class="w-full py-3 bg-black/20 hover:bg-white/5 text-[11.5px] font-bold text-ios-blue active-spring tracking-wide flex justify-center items-center gap-1.5 transition-colors">Lihat Lebih Banyak <span id="load-more-count" class="bg-ios-blue/20 text-ios-blue px-1.5 py-0.5 rounded-full text-[9.5px]"></span></button>
           </div>
         </div>
       </div>
 
-      <!-- MEMBERS TAB -->
-      <div id="tab-members" class="tab-content hidden space-y-3 pb-8">
-        <div class="flex items-center justify-between px-0.5">
-          <h2 class="text-[24px] font-bold tracking-tight">Anggota</h2>
+      <!-- TAB MEMBERS -->
+      <div id="tab-members" class="tab-content hidden space-y-2">
+        <div class="flex items-center justify-between px-0.5"><h2 class="text-[17px] font-bold tracking-tight">Anggota</h2></div>
+        <div class="relative w-full mb-1">
+          <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-white/40"><i class="fa-solid fa-magnifying-glass text-[10px]"></i></div>
+          <input type="text" id="search-members" class="ios-input pl-7 h-8 bg-white/10 text-[15px]" placeholder="Cari nama...">
         </div>
-
-        <div class="relative w-full">
-          <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-white/40">
-            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        
+        <div class="ios-cc-module !rounded-[16px] p-2 flex flex-col gap-1.5 relative overflow-hidden bg-[#1C1C1E]/70 backdrop-blur-2xl border border-white/10 shadow-sm mb-2">
+          <div class="absolute -top-10 -right-10 w-24 h-24 bg-white/5 rounded-full blur-[20px] pointer-events-none"></div>
+          <div class="flex items-center justify-between px-1 relative z-10">
+            <h3 class="text-[9px] font-bold tracking-widest text-white/50 uppercase">Ringkasan Status</h3>
+            <button id="btn-filter-all" class="text-[8.5px] font-bold text-white bg-white/20 px-2 py-0.5 rounded-full border border-white/30 active-spring transition-colors shadow-sm" onclick="setMemberFilter('all')"><span id="sum-total-members">0</span> Total</button>
           </div>
-          <input type="text" id="search-members" class="ios-input pl-8 h-9 bg-white/10 text-[13px]" placeholder="Cari nama/alamat...">
+          <div class="grid grid-cols-3 gap-1.5 relative z-10">
+            <div id="filter-card-lunas" class="filter-card cursor-pointer py-1 px-1 rounded-[10px] flex flex-col items-center justify-center text-center border border-white/5 bg-white/5 active-spring transition-all duration-300 hover:bg-white/10" onclick="setMemberFilter('lunas')">
+              <span class="text-[13px] font-bold text-ios-green leading-none mb-0.5 drop-shadow-sm" id="sum-paid-members">0</span>
+              <span class="text-[7.5px] font-bold uppercase tracking-wider text-white/60">Lunas</span>
+            </div>
+            <div id="filter-card-belum" class="filter-card cursor-pointer py-1 px-1 rounded-[10px] flex flex-col items-center justify-center text-center border border-white/5 bg-white/5 active-spring transition-all duration-300 hover:bg-white/10" onclick="setMemberFilter('belum')">
+              <span class="text-[13px] font-bold text-ios-orange leading-none mb-0.5 drop-shadow-sm" id="sum-unpaid-members">0</span>
+              <span class="text-[7.5px] font-bold uppercase tracking-wider text-white/60">Blm Bayar</span>
+            </div>
+            <div id="filter-card-telat" class="filter-card cursor-pointer py-1 px-1 rounded-[10px] flex flex-col items-center justify-center text-center border border-white/5 bg-white/5 active-spring transition-all duration-300 hover:bg-white/10" onclick="setMemberFilter('telat')">
+              <span class="text-[13px] font-bold text-ios-red leading-none mb-0.5 drop-shadow-sm" id="sum-overdue-members">0</span>
+              <span class="text-[7.5px] font-bold uppercase tracking-wider text-white/60">> 1 Bln</span>
+            </div>
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-2.5" id="grid-members-view"></div>
+        <div class="grid grid-cols-1 gap-1.5" id="grid-members-view"></div>
       </div>
 
-      <!-- REPORTS TAB -->
-      <div id="tab-reports" class="tab-content hidden space-y-3 pb-8">
+      <!-- TAB REPORTS -->
+      <div id="tab-reports" class="tab-content hidden space-y-2">
         <div class="flex items-center justify-between px-0.5">
-          <h2 class="text-[24px] font-bold tracking-tight">Laporan</h2>
+          <h2 class="text-[17px] font-bold tracking-tight">Laporan</h2>
           <div class="flex items-center gap-1.5">
-            <button id="btn-wa-members-status" class="hidden admin-only h-8 px-2.5 rounded-full bg-ios-blue text-white flex items-center justify-center active-spring shadow shrink-0 text-xs font-semibold gap-1" title="Bagikan Status Iuran Anggota">
-              <i class="fa-brands fa-whatsapp text-sm"></i>
-              <span>Status Iuran</span>
-            </button>
-            <button id="btn-wa-report" class="hidden admin-only w-8 h-8 rounded-full bg-ios-green text-white flex items-center justify-center active-spring shadow shrink-0 text-sm" title="Laporan Rekap WA">
-              <i class="fa-brands fa-whatsapp"></i>
-            </button>
+            <button id="btn-wa-members-status" type="button" class="hidden admin-only h-7 px-2 rounded-[10px] bg-ios-blue/15 text-ios-blue flex items-center justify-center active-spring shrink-0 text-[10px] font-semibold gap-1 border border-ios-blue/20" title="Status WA"><i class="fa-solid fa-user-check"></i> <span>Status WA</span></button>
+            <button id="btn-wa-report" type="button" class="hidden admin-only w-7 h-7 rounded-[10px] bg-ios-green/15 text-ios-green flex items-center justify-center active-spring shrink-0 text-[11px] border border-ios-green/20" title="Laporan WA"><i class="fa-brands fa-whatsapp"></i></button>
           </div>
         </div>
-
-        <div class="flex gap-2 w-full">
-          <select id="report-month" class="ios-input w-[60%] h-9 bg-white/10 text-[12px]"></select>
-          <select id="report-year" class="ios-input w-[40%] h-9 bg-white/10 text-[12px]"></select>
+        <div class="flex gap-1.5 w-full">
+          <select id="report-month" class="ios-input flex-1 h-8 bg-white/10 text-[15px] text-center"></select>
+          <select id="report-year" class="ios-input w-[95px] shrink-0 h-8 bg-white/10 text-[15px] text-center"></select>
         </div>
-
-        <div class="ios-cc-module rounded-[20px] p-4 flex flex-col justify-center items-center shadow relative overflow-hidden">
-          <div class="absolute top-[-50%] right-[-10%] w-48 h-48 bg-white/5 rounded-full blur-[40px] pointer-events-none"></div>
-          <span class="text-[10px] text-white/50 font-semibold uppercase tracking-widest mb-0.5">Kas Bersih Bulan Ini</span>
-          <div id="report-net" class="text-2xl font-bold text-white tracking-tight drop-shadow text-center w-full">Rp 0</div>
+        <div class="ios-cc-module !rounded-[16px] p-2.5 flex flex-col justify-center items-center shadow-sm relative overflow-hidden">
+          <div class="absolute top-[-50%] right-[-10%] w-32 h-32 bg-white/5 rounded-full blur-[30px] pointer-events-none"></div>
+          <span class="text-[9px] text-white/50 font-semibold uppercase tracking-widest mb-0.5">Kas Bersih Bulan Ini</span>
+          <div id="report-net" class="text-lg font-bold text-white tracking-tight drop-shadow text-center w-full">Rp 0</div>
         </div>
-
-        <div class="ios-list shadow bg-[#1C1C1E]/80">
-          <div class="ios-list-item !py-2.5">
-            <div class="w-8 h-8 rounded-full bg-ios-blue text-white flex items-center justify-center mr-2.5 shrink-0 text-xs"><i class="fa-solid fa-wallet"></i></div>
+        <div class="ios-list shadow-sm bg-[#1C1C1E]/80">
+          <div class="ios-list-item !py-1.5">
+            <div class="w-5 h-5 rounded-full bg-ios-blue text-white flex items-center justify-center mr-2 shrink-0 text-[8px]"><i class="fa-solid fa-wallet"></i></div>
             <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <span class="text-[12px] font-medium text-white/70" id="label-report-prev-balance">Saldo Akhir Lalu</span>
-              <span class="font-semibold text-white text-[13px]" id="report-prev-balance">Rp 0</span>
+              <span class="text-[11px] font-medium text-white/70" id="label-report-prev-balance">Saldo Akhir Lalu</span>
+              <span class="font-semibold text-white text-[11px]" id="report-prev-balance">Rp 0</span>
             </div>
           </div>
-          <div class="ios-list-item !py-2.5 border-t border-white/5">
-            <div class="w-8 h-8 rounded-full bg-ios-green text-white flex items-center justify-center mr-2.5 shrink-0 text-xs"><i class="fa-solid fa-arrow-down"></i></div>
+          <div class="ios-list-item !py-1.5 border-t border-white/5">
+            <div class="w-5 h-5 rounded-full bg-ios-green text-white flex items-center justify-center mr-2 shrink-0 text-[8px]"><i class="fa-solid fa-arrow-down"></i></div>
             <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <span class="text-[12px] font-medium text-white/70" id="label-report-in">Total Pemasukan</span>
-              <span class="font-semibold text-ios-green text-[13px]" id="report-in">Rp 0</span>
+              <span class="text-[11px] font-medium text-white/70" id="label-report-in">Pemasukan</span>
+              <span class="font-semibold text-ios-green text-[11px]" id="report-in">Rp 0</span>
             </div>
           </div>
-          <div class="ios-list-item !py-2.5 border-t border-white/5">
-            <div class="w-8 h-8 rounded-full bg-ios-red text-white flex items-center justify-center mr-2.5 shrink-0 text-xs"><i class="fa-solid fa-arrow-up"></i></div>
+          <div class="ios-list-item !py-1.5 border-t border-white/5">
+            <div class="w-5 h-5 rounded-full bg-ios-red text-white flex items-center justify-center mr-2 shrink-0 text-[8px]"><i class="fa-solid fa-arrow-up"></i></div>
             <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <span class="text-[12px] font-medium text-white/70" id="label-report-out">Total Pengeluaran</span>
-              <span class="font-semibold text-ios-red text-[13px]" id="report-out">Rp 0</span>
+              <span class="text-[11px] font-medium text-white/70" id="label-report-out">Pengeluaran</span>
+              <span class="font-semibold text-ios-red text-[11px]" id="report-out">Rp 0</span>
             </div>
           </div>
         </div>
-
-        <div class="grid grid-cols-1 gap-3">
-          <div class="ios-list p-3 shadow relative overflow-hidden bg-[#1C1C1E]/80">
-            <h4 class="text-[11px] font-semibold uppercase tracking-widest mb-2.5 text-ios-green flex items-center gap-1.5 pb-1.5 border-b border-white/10"><i class="fa-solid fa-chart-simple"></i> Rincian Pemasukan</h4>
-            <div id="container-report-cat-in" class="space-y-2.5"></div>
+        <div class="grid grid-cols-1 gap-2">
+          <div class="ios-list p-2.5 shadow-sm relative overflow-hidden bg-[#1C1C1E]/80">
+            <h4 class="text-[10px] font-semibold uppercase tracking-widest mb-2 text-ios-green flex items-center gap-1 pb-1 border-b border-white/10"><i class="fa-solid fa-chart-simple"></i> Rincian Pemasukan</h4>
+            <div id="container-report-cat-in" class="space-y-1.5"></div>
           </div>
-
-          <div class="ios-list p-3 shadow relative overflow-hidden bg-[#1C1C1E]/80">
-            <h4 class="text-[11px] font-semibold uppercase tracking-widest mb-2.5 text-ios-red flex items-center gap-1.5 pb-1.5 border-b border-white/10"><i class="fa-solid fa-chart-simple"></i> Rincian Pengeluaran</h4>
-            <div id="container-report-cat-out" class="space-y-2.5"></div>
+          <div class="ios-list p-2.5 shadow-sm relative overflow-hidden bg-[#1C1C1E]/80">
+            <h4 class="text-[10px] font-semibold uppercase tracking-widest mb-2 text-ios-red flex items-center gap-1 pb-1 border-b border-white/10"><i class="fa-solid fa-chart-simple"></i> Rincian Pengeluaran</h4>
+            <div id="container-report-cat-out" class="space-y-1.5"></div>
           </div>
         </div>
       </div>
 
-      <!-- SETTINGS TAB -->
-      <div id="tab-settings" class="tab-content hidden space-y-3 pb-8 admin-only">
-        <h2 class="text-[24px] font-bold tracking-tight mb-2">Pengaturan</h2>
-
-        <div class="ios-list shadow bg-[#1C1C1E]/80 divide-y divide-white/10">
-          
-          <div id="menu-setting-logo" class="ios-list-item !py-3 active-spring">
-            <div class="w-8 h-8 rounded-full bg-ios-blue/20 text-ios-blue flex items-center justify-center mr-3 shrink-0 text-xs border border-ios-blue/30">
-              <i class="fa-solid fa-palette"></i>
-            </div>
-            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-semibold text-white">Logo & Tampilan Aplikasi</span>
-                <span class="text-[10px] text-white/50 truncate">Kustomisasi logo, warna gradien, atau gambar</span>
-              </div>
-              <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
-            </div>
+      <!-- TAB SETTINGS -->
+      <div id="tab-settings" class="tab-content hidden space-y-2 admin-only">
+        <h2 class="text-[17px] font-bold tracking-tight mb-1.5">Pengaturan</h2>
+        <div class="ios-list shadow-sm bg-[#1C1C1E]/80 divide-y divide-white/10">
+          <div id="menu-setting-logo" class="ios-list-item !py-2 active-spring">
+            <div class="w-6 h-6 rounded-full bg-ios-blue/20 text-ios-blue flex items-center justify-center mr-2.5 shrink-0 text-[9px] border border-ios-blue/30"><i class="fa-solid fa-palette"></i></div>
+            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0"><span class="text-[12px] font-semibold text-white">Logo & Tampilan</span><i class="fa-solid fa-chevron-right text-white/30 text-[9px] shrink-0 ml-2"></i></div>
           </div>
-
-          <div id="menu-setting-firebase" class="ios-list-item !py-3 active-spring">
-            <div class="w-8 h-8 rounded-full bg-ios-yellow/20 text-yellow-400 flex items-center justify-center mr-3 shrink-0 text-xs border border-yellow-400/30">
-              <i class="fa-solid fa-server"></i>
-            </div>
-            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-semibold text-white">Konfigurasi Database</span>
-                <span class="text-[10px] text-white/50 truncate">Masukkan API Key agar aplikasi menjadi Online</span>
-              </div>
-              <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
-            </div>
+          <div id="menu-setting-archive" class="ios-list-item !py-2 active-spring">
+            <div class="w-6 h-6 rounded-full bg-ios-indigo/20 text-ios-indigo flex items-center justify-center mr-2.5 shrink-0 text-[9px] border border-ios-indigo/30"><i class="fa-solid fa-box-archive"></i></div>
+            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0"><span class="text-[12px] font-semibold text-white">Arsip Tahun</span><i class="fa-solid fa-chevron-right text-white/30 text-[9px] shrink-0 ml-2"></i></div>
           </div>
-
-          <div id="menu-setting-archive" class="ios-list-item !py-3 active-spring">
-            <div class="w-8 h-8 rounded-full bg-ios-indigo/20 text-ios-indigo flex items-center justify-center mr-3 shrink-0 text-xs border border-ios-indigo/30">
-              <i class="fa-solid fa-box-archive"></i>
-            </div>
-            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-semibold text-white">Arsip & Tutup Buku Tahunan</span>
-                <span class="text-[10px] text-white/50 truncate">Kunci data & pindahkan saldo ke tahun baru</span>
-              </div>
-              <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
-            </div>
+          <div id="menu-setting-dues" class="ios-list-item !py-2 active-spring">
+            <div class="w-6 h-6 rounded-full bg-ios-orange/20 text-ios-orange flex items-center justify-center mr-2.5 shrink-0 text-[9px] border border-ios-orange/30"><i class="fa-solid fa-coins"></i></div>
+            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0"><span class="text-[12px] font-semibold text-white">Nominal Iuran</span><i class="fa-solid fa-chevron-right text-white/30 text-[9px] shrink-0 ml-2"></i></div>
           </div>
-
-          <div id="menu-setting-dues" class="ios-list-item !py-3 active-spring">
-            <div class="w-8 h-8 rounded-full bg-ios-orange/20 text-ios-orange flex items-center justify-center mr-3 shrink-0 text-xs border border-ios-orange/30">
-              <i class="fa-solid fa-coins"></i>
-            </div>
-            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-semibold text-white">Iuran Bulanan Pokok</span>
-                <span class="text-[10px] text-white/50 truncate" id="menu-dues-subtitle">Atur nominal default iuran bulanan</span>
-              </div>
-              <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
-            </div>
+          <div id="menu-setting-backup" class="ios-list-item !py-2 active-spring">
+            <div class="w-6 h-6 rounded-full bg-ios-teal/20 text-ios-teal flex items-center justify-center mr-2.5 shrink-0 text-[9px] border border-ios-teal/30"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0"><span class="text-[12px] font-semibold text-white">Cadangan (Backup)</span><i class="fa-solid fa-chevron-right text-white/30 text-[9px] shrink-0 ml-2"></i></div>
           </div>
-
-          <div id="menu-setting-backup" class="ios-list-item !py-3 active-spring">
-            <div class="w-8 h-8 rounded-full bg-ios-teal/20 text-ios-teal flex items-center justify-center mr-3 shrink-0 text-xs border border-ios-teal/30">
-              <i class="fa-solid fa-cloud-arrow-down"></i>
-            </div>
-            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-semibold text-white">Pencadangan Data (Backup)</span>
-                <span class="text-[10px] text-white/50 truncate">Ekspor/Impor file JSON lokal & cadangan</span>
-              </div>
-              <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
-            </div>
+          <div id="menu-setting-users" class="ios-list-item !py-2 active-spring">
+            <div class="w-6 h-6 rounded-full bg-ios-green/20 text-ios-green flex items-center justify-center mr-2.5 shrink-0 text-[9px] border border-ios-green/30"><i class="fa-solid fa-users-gear"></i></div>
+            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0"><span class="text-[12px] font-semibold text-white">Admin Sistem</span><i class="fa-solid fa-chevron-right text-white/30 text-[9px] shrink-0 ml-2"></i></div>
           </div>
-
-          <div id="menu-setting-users" class="ios-list-item !py-3 active-spring">
-            <div class="w-8 h-8 rounded-full bg-ios-green/20 text-ios-green flex items-center justify-center mr-3 shrink-0 text-xs border border-ios-green/30">
-              <i class="fa-solid fa-users-gear"></i>
-            </div>
-            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-semibold text-white">Manajemen Admin</span>
-                <span class="text-[10px] text-white/50 truncate" id="menu-users-subtitle">Tambah & atur hak akses pengurus</span>
-              </div>
-              <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
-            </div>
+          <div id="menu-setting-categories" class="ios-list-item !py-2 active-spring">
+            <div class="w-6 h-6 rounded-full bg-ios-red/20 text-ios-red flex items-center justify-center mr-2.5 shrink-0 text-[9px] border border-ios-red/30"><i class="fa-solid fa-tags"></i></div>
+            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0"><span class="text-[12px] font-semibold text-white">Kategori Kas</span><i class="fa-solid fa-chevron-right text-white/30 text-[9px] shrink-0 ml-2"></i></div>
           </div>
-
-          <div id="menu-setting-categories" class="ios-list-item !py-3 active-spring">
-            <div class="w-8 h-8 rounded-full bg-ios-red/20 text-ios-red flex items-center justify-center mr-3 shrink-0 text-xs border border-ios-red/30">
-              <i class="fa-solid fa-tags"></i>
-            </div>
-            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0">
-              <div class="flex flex-col min-w-0">
-                <span class="text-[13px] font-semibold text-white">Kategori Kas</span>
-                <span class="text-[10px] text-white/50 truncate" id="menu-cats-subtitle">Atur daftar kategori pemasukan/pengeluaran</span>
-              </div>
-              <i class="fa-solid fa-chevron-right text-white/30 text-xs shrink-0 ml-2"></i>
-            </div>
+          <div id="menu-setting-reset" class="ios-list-item !py-2 active-spring">
+            <div class="w-6 h-6 rounded-full bg-ios-red/20 text-ios-red flex items-center justify-center mr-2.5 shrink-0 text-[9px] border border-ios-red/30"><i class="fa-solid fa-radiation"></i></div>
+            <div class="ios-list-content border-none !pb-0 !mb-0 w-full min-w-0"><span class="text-[12px] font-semibold text-ios-red">Reset Semua Data</span><i class="fa-solid fa-chevron-right text-ios-red/30 text-[9px] shrink-0 ml-2"></i></div>
           </div>
-
         </div>
       </div>
-
     </main>
   </div>
 
-  <!-- FLOATING NAVIGATION BAR -->
-  <div class="fixed bottom-0 left-0 right-0 z-30 flex justify-center pb-safe pointer-events-none">
-    <nav class="floating-nav w-[calc(100%-1.5rem)] max-w-md flex justify-around items-center h-[58px] mb-3 px-1 pointer-events-auto">
-      <button id="botnav-dashboard" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white active-spring">
-        <i class="fa-solid fa-house text-[18px]"></i>
-        <span class="text-[8px] font-medium tracking-wide">Ringkasan</span>
-      </button>
-      <button id="botnav-transactions" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring">
-        <i class="fa-solid fa-wallet text-[18px]"></i>
-        <span class="text-[8px] font-medium tracking-wide">Transaksi</span>
-      </button>
-      
-      <div class="flex flex-col items-center justify-center -mt-6 admin-only w-[20%] relative z-50">
-        <button id="btn-floating-action" class="w-[48px] h-[48px] rounded-full bg-ios-blue text-white shadow-[0_8px_20px_rgba(10,132,255,0.5)] flex items-center justify-center active-spring border-[3px] border-[rgba(28,28,30,0.92)]">
-          <i class="fa-solid fa-plus text-[20px]"></i>
-        </button>
+  <div class="fixed bottom-0 left-0 right-0 z-30 flex justify-center pointer-events-none pb-[max(6px,env(safe-area-inset-bottom))] w-full">
+    <nav class="floating-nav w-[calc(100%-1.25rem)] max-w-[380px] flex justify-around items-center h-[52px] px-1 pointer-events-auto mx-auto relative">
+      <button id="botnav-dashboard" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white active-spring"><i class="fa-solid fa-house text-[16px]"></i><span class="text-[7.5px] font-medium tracking-wide">Ringkasan</span></button>
+      <button id="botnav-transactions" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-wallet text-[16px]"></i><span class="text-[7.5px] font-medium tracking-wide">Transaksi</span></button>
+      <div class="flex flex-col items-center justify-center -mt-5 admin-only w-[20%] relative z-50">
+        <button id="btn-floating-action" class="w-[46px] h-[46px] rounded-full bg-ios-blue text-white shadow-[0_5px_12px_rgba(10,132,255,0.5)] flex items-center justify-center active-spring border-[3px] border-[#000000]"><i class="fa-solid fa-plus text-[18px]"></i></button>
       </div>
-
-      <button id="botnav-members" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring">
-        <i class="fa-solid fa-users text-[18px]"></i>
-        <span class="text-[8px] font-medium tracking-wide">Anggota</span>
-      </button>
-      <button id="botnav-reports" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring">
-        <i class="fa-solid fa-chart-pie text-[18px]"></i>
-        <span class="text-[8px] font-medium tracking-wide">Laporan</span>
-      </button>
+      <button id="botnav-members" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-users text-[16px]"></i><span class="text-[7.5px] font-medium tracking-wide">Anggota</span></button>
+      <button id="botnav-reports" class="flex flex-col items-center justify-center gap-0.5 w-[20%] text-white/40 hover:text-white active-spring"><i class="fa-solid fa-chart-pie text-[16px]"></i><span class="text-[7.5px] font-medium tracking-wide">Laporan</span></button>
     </nav>
   </div>
 </div>
 
-<!-- MODAL BACKDROP -->
-<div id="modal-backdrop" class="fixed inset-0 bg-black/60 z-[100] hidden transition-opacity opacity-0 duration-300"></div>
+<!-- MODALS -->
+<div id="modal-backdrop" class="fixed inset-0 bg-black/70 z-[100] hidden transition-opacity opacity-0 duration-300"></div>
 
-<!-- MODAL ACTION MENU -->
-<div id="modal-action-menu" class="fixed bottom-0 left-0 right-0 mx-auto z-[101] w-full max-w-md bg-[#1C1C1E] rounded-t-[32px] p-4 modal-sheet shadow-2xl flex flex-col border-t border-white/10">
-  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4 shrink-0"></div>
-  <div class="flex justify-between items-center mb-3">
-    <h3 class="text-[20px] font-bold tracking-tight text-white">Aksi Cepat</h3>
-    <button class="btn-close-modals w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white/70 active-spring shrink-0"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-  <div class="space-y-2.5 pb-2">
-    <button id="action-btn-catat-tx" class="w-full flex items-center gap-3 p-3 rounded-[18px] bg-[#2C2C2E] active-spring text-left border border-white/5">
-      <div class="w-10 h-10 rounded-[12px] bg-ios-blue text-white flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-wallet"></i></div>
-      <div class="flex-1 min-w-0">
-        <h4 class="font-semibold text-[14px] text-white tracking-tight truncate">Catat Transaksi</h4>
-        <p class="text-[11px] text-white/50 mt-0.5 truncate">Pemasukan & Pengeluaran kas</p>
-      </div>
-    </button>
-    <button id="action-btn-tambah-anggota" class="w-full flex items-center gap-3 p-3 rounded-[18px] bg-[#2C2C2E] active-spring text-left border border-white/5">
-      <div class="w-10 h-10 rounded-[12px] bg-ios-green text-white flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-plus"></i></div>
-      <div class="flex-1 min-w-0">
-        <h4 class="font-semibold text-[14px] text-white tracking-tight truncate">Tambah Anggota</h4>
-        <p class="text-[11px] text-white/50 mt-0.5 truncate">Daftarkan warga baru</p>
-      </div>
-    </button>
+<div id="modal-confirm" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4 bg-black/60 transition-opacity opacity-0">
+  <div class="bg-[#1C1C1E] border border-white/10 rounded-[20px] p-4 w-full max-w-[270px] shadow-2xl transform scale-95 transition-transform duration-300">
+    <div class="text-center mb-3"><i class="fa-solid fa-triangle-exclamation text-ios-orange text-[28px] mb-2 drop-shadow-sm"></i><h3 class="text-[14px] font-bold text-white mb-1">Konfirmasi</h3><p id="confirm-msg" class="text-[11px] text-white/60 leading-tight">Apakah Anda yakin?</p></div>
+    <div class="flex gap-2"><button id="btn-confirm-cancel" class="flex-1 py-2 rounded-[10px] bg-white/10 hover:bg-white/15 text-white font-semibold text-[12px] active-spring">Batal</button><button id="btn-confirm-ok" class="flex-1 py-2 rounded-[10px] bg-ios-red/90 hover:bg-ios-red text-white font-semibold text-[12px] active-spring shadow-sm">Ya, Lanjut</button></div>
   </div>
 </div>
 
-<!-- MODAL GANTI LOGO APLIKASI -->
-<div id="modal-app-logo" class="fixed bottom-0 left-0 right-0 mx-auto z-[101] w-full max-w-md bg-[#1C1C1E] rounded-t-[32px] p-5 modal-sheet shadow-2xl flex flex-col max-h-[90vh] border-t border-white/10">
-  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 shrink-0"></div>
-  <div class="flex justify-between items-center mb-3 shrink-0">
-    <h3 class="text-[20px] font-bold tracking-tight text-white">Ganti Logo Aplikasi</h3>
-    <button class="btn-close-modals w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white/70 active-spring shrink-0"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-
-  <div class="space-y-4 overflow-y-auto overscroll-contain flex-1 pb-4 pr-1">
-    <div class="flex flex-col items-center justify-center p-3 bg-black/40 rounded-[20px] border border-white/10">
-      <span class="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Pratinjau Logo</span>
-      <div id="logo-preview-box" class="w-16 h-16 rounded-[20px] bg-gradient-to-br from-ios-blue to-blue-700 flex items-center justify-center text-white text-2xl shadow-lg border border-white/20 overflow-hidden relative">
-        <div class="app-logo-render-target flex items-center justify-center w-full h-full">
-          <i class="fa-solid fa-vault"></i>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-1">Tipe Logo</label>
-      <div class="grid grid-cols-2 gap-2 bg-black/40 p-1 rounded-[14px] border border-white/5">
-        <button type="button" id="btn-logo-type-preset" class="py-1.5 text-[12px] font-semibold rounded-[10px] bg-[#2C2C2E] text-white transition-all">Ikon Preset</button>
-        <button type="button" id="btn-logo-type-custom" class="py-1.5 text-[12px] font-semibold rounded-[10px] text-white/50 transition-all">Foto / Gambar</button>
-      </div>
-    </div>
-
-    <div id="section-logo-preset" class="space-y-3">
-      <div>
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-1">Pilih Ikon Simbol</label>
-        <div class="grid grid-cols-5 gap-2" id="grid-preset-icons"></div>
-      </div>
-      <div>
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-1">Tema Warna Gradien</label>
-        <div class="grid grid-cols-4 gap-2" id="grid-preset-gradients"></div>
-      </div>
-    </div>
-
-    <div id="section-logo-custom" class="space-y-3 hidden">
-      <div>
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-1">Unggah File Foto</label>
-        <label class="w-full py-3 bg-white/10 hover:bg-white/15 rounded-[14px] text-[13px] font-medium text-white flex justify-center items-center cursor-pointer border border-white/10 active-spring">
-          <i class="fa-solid fa-image mr-2 text-ios-teal"></i> Pilih File Foto Logo
-          <input type="file" id="input-logo-file" accept="image/*" class="hidden">
-        </label>
-      </div>
-      <div>
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-1">Atau Gunakan URL Gambar</label>
-        <input type="url" id="input-logo-url" class="ios-input h-10 text-[13px]" placeholder="https://domain.com/logo.png">
-      </div>
-    </div>
-
-    <button type="button" id="btn-save-logo-config" class="w-full bg-ios-blue text-white py-3 rounded-[16px] font-semibold text-[15px] active-spring mt-2 shadow">
-      Simpan Logo Baru
-    </button>
+<!-- TX CONTEXT MODAL -->
+<div id="modal-tx-context" class="fixed bottom-0 left-0 right-0 mx-auto z-[105] w-full max-w-md bg-[#1C1C1E] rounded-t-[24px] p-3 modal-sheet shadow-2xl border-t border-white/10">
+  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-2 shrink-0"></div>
+  <div class="text-center mb-3"><h3 id="ctx-tx-title" class="text-[14px] font-bold text-white truncate px-4">Menu Transaksi</h3><p id="ctx-tx-amount" class="text-[11px] font-medium text-white/50">Rp 0</p></div>
+  <div class="space-y-1.5 pb-2 px-1">
+    <button id="ctx-btn-edit" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-pen text-ios-teal text-[14px]"></i> Edit Transaksi</button>
+    <button id="ctx-btn-delete" class="w-full py-2.5 bg-ios-red/15 text-ios-red border border-ios-red/20 rounded-[12px] font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-trash text-[14px]"></i> Hapus Permanen</button>
   </div>
 </div>
 
-<!-- MODAL TRANSACTION -->
-<div id="modal-transaction" class="fixed bottom-0 left-0 right-0 mx-auto z-[101] w-full max-w-md bg-[#1C1C1E] rounded-t-[32px] p-4 modal-sheet shadow-2xl flex flex-col max-h-[92vh] border-t border-white/10">
-  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 shrink-0"></div>
-  <div class="flex justify-between items-center mb-3 shrink-0">
-    <h3 id="modal-tx-title" class="text-[20px] font-bold tracking-tight text-white">Catat Transaksi</h3>
-    <button class="btn-close-modals w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white/70 active-spring shrink-0"><i class="fa-solid fa-xmark"></i></button>
+<!-- MEMBER CONTEXT MODAL -->
+<div id="modal-member-context" class="fixed bottom-0 left-0 right-0 mx-auto z-[105] w-full max-w-md bg-[#1C1C1E] rounded-t-[24px] p-3 modal-sheet shadow-2xl border-t border-white/10">
+  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-2 shrink-0"></div>
+  <div class="text-center mb-3"><h3 id="ctx-member-title" class="text-[14px] font-bold text-white truncate px-4">Menu Anggota</h3><p id="ctx-member-phone" class="text-[11px] font-medium text-white/50">-</p></div>
+  <div class="space-y-1.5 pb-2 px-1">
+    <button id="ctx-member-btn-detail" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-id-card text-ios-blue text-[14px]"></i> Lihat Detail</button>
+    <button id="ctx-member-btn-edit" class="w-full py-2.5 bg-[#2C2C2E] rounded-[12px] text-white font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-pen text-ios-teal text-[14px]"></i> Edit Anggota</button>
+    <button id="ctx-member-btn-delete" class="w-full py-2.5 bg-ios-red/15 text-ios-red border border-ios-red/20 rounded-[12px] font-semibold text-[12px] flex items-center justify-center gap-2 active-spring"><i class="fa-solid fa-trash text-[14px]"></i> Hapus Anggota</button>
   </div>
-  
-  <form id="form-transaction" class="space-y-3 overflow-y-auto overscroll-contain flex-1 pb-4">
-    <input type="hidden" id="tx-id">
+</div>
+
+<div id="modal-action-menu" class="fixed bottom-0 left-0 right-0 mx-auto z-[101] w-full max-w-md bg-[#1C1C1E] rounded-t-[28px] p-3.5 modal-sheet shadow-2xl flex flex-col border-t border-white/10">
+  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 shrink-0"></div>
+  <div class="flex justify-between items-center mb-2"><h3 class="text-[15px] font-bold tracking-tight text-white">Aksi Cepat</h3><button class="btn-close-modals w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[11px] text-white/70 active-spring shrink-0"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="space-y-2 pb-2">
+    <button id="action-btn-catat-tx" class="w-full flex items-center gap-2.5 p-2.5 rounded-[14px] bg-[#2C2C2E] active-spring text-left border border-white/5"><div class="w-9 h-9 rounded-[10px] bg-ios-blue text-white flex items-center justify-center text-[14px] shrink-0"><i class="fa-solid fa-wallet"></i></div><div class="flex-1 min-w-0"><h4 class="font-semibold text-[13px] text-white tracking-tight truncate">Catat Transaksi</h4><p class="text-[10px] text-white/50 mt-0.5 truncate">Pemasukan & Pengeluaran kas</p></div></button>
+    <button id="action-btn-tambah-anggota" class="w-full flex items-center gap-2.5 p-2.5 rounded-[14px] bg-[#2C2C2E] active-spring text-left border border-white/5"><div class="w-9 h-9 rounded-[10px] bg-ios-green text-white flex items-center justify-center text-[14px] shrink-0"><i class="fa-solid fa-user-plus"></i></div><div class="flex-1 min-w-0"><h4 class="font-semibold text-[13px] text-white tracking-tight truncate">Tambah Anggota</h4><p class="text-[10px] text-white/50 mt-0.5 truncate">Daftarkan anggota baru</p></div></button>
+  </div>
+</div>
+
+<div id="modal-generic" class="fixed bottom-0 left-0 right-0 mx-auto z-[101] w-full max-w-md bg-[#1C1C1E] rounded-t-[28px] p-3.5 modal-sheet shadow-2xl flex flex-col max-h-[90vh] border-t border-white/10">
+  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-2 shrink-0"></div>
+  <div class="flex justify-between items-center mb-2 shrink-0"><h3 id="modal-generic-title" class="text-[15px] font-bold tracking-tight text-white">Form</h3><button class="btn-close-modals w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[11px] text-white/70 active-spring shrink-0"><i class="fa-solid fa-xmark"></i></button></div>
+  <div id="modal-generic-content" class="pb-4 overflow-y-auto w-full"></div>
+</div>
+
+<!-- Essential scripts moved strictly inside to guarantee cached rendering -->
+<script type="text/javascript">
+  function renderGlobalAppLogo(logoData) {
+    if (!logoData) return; 
+    const targets = document.querySelectorAll('.app-logo-render-target'); 
+    const loginBox = document.getElementById('login-logo-box'); 
+    const headerBox = document.getElementById('header-logo-box');
     
-    <div class="bg-black/40 rounded-[14px] p-1 flex relative border border-white/5">
-      <div id="tx-type-bg" class="absolute w-[calc(50%-4px)] h-[calc(100%-8px)] bg-[#2C2C2E] rounded-[10px] top-1 left-1 transition-transform duration-300 border border-white/10"></div>
-      <button type="button" id="btn-type-in" class="flex-1 py-1.5 text-[13px] font-semibold relative z-10 text-white transition-colors">Pemasukan</button>
-      <button type="button" id="btn-type-out" class="flex-1 py-1.5 text-[13px] font-semibold relative z-10 text-white/50 transition-colors">Pengeluaran</button>
-      <input type="hidden" id="tx-type" value="Pemasukan">
-    </div>
+    if (logoData.mode === 'preset') {
+      if(loginBox) loginBox.className = `w-16 h-16 rounded-[22px] bg-gradient-to-br ${logoData.color || 'from-ios-blue to-blue-700'} flex items-center justify-center text-white text-2xl mb-3 ring-1 ring-white/20 shrink-0 shadow-[0_10px_25px_rgba(10,132,255,0.4)] overflow-hidden relative`;
+      if(headerBox) headerBox.className = `w-7 h-7 rounded-[8px] bg-gradient-to-br ${logoData.color || 'from-ios-blue to-blue-600'} flex items-center justify-center text-white shadow-sm overflow-hidden relative border border-white/15 shrink-0`;
+      targets.forEach(t => t.innerHTML = `<i class="fa-solid ${logoData.icon || 'fa-vault'}"></i>`);
+    } else {
+      if(loginBox) loginBox.className = `w-16 h-16 rounded-[22px] bg-neutral-900 flex items-center justify-center text-white text-2xl mb-3 ring-1 ring-white/20 shrink-0 shadow-[0_10px_25px_rgba(10,132,255,0.4)] overflow-hidden relative`;
+      if(headerBox) headerBox.className = `w-7 h-7 rounded-[8px] bg-neutral-900 flex items-center justify-center text-white shadow-sm overflow-hidden relative border border-white/15 shrink-0`;
+      targets.forEach(t => { if (logoData.imageUrl) t.innerHTML = `<img src="${logoData.imageUrl}" class="w-full h-full object-cover">`; });
+    }
+  }
 
-    <div>
-      <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-0.5">Kategori</label>
-      <select id="tx-category" class="ios-input h-10 bg-white/10 text-[13px]"></select>
-    </div>
+  // Instantly apply cached logo before browser paints the rest
+  if (window.__initialLogoCache) {
+    renderGlobalAppLogo(window.__initialLogoCache);
+  }
 
-    <div id="tx-member-wrapper" class="grid transition-all duration-300 ease-in-out grid-rows-[0fr] opacity-0 pointer-events-none">
-      <div class="overflow-hidden min-h-0">
-        <div id="tx-member-container" class="bg-[#2C2C2E] rounded-[16px] p-3 space-y-2 border border-white/5 my-1">
-          <div>
-            <label class="text-[10px] font-semibold text-ios-blue uppercase tracking-widest ml-1 block mb-0.5">Nama Anggota</label>
-            <select id="tx-member-select" class="ios-input bg-black/40 h-10 border-white/5 text-[13px]"></select>
-          </div>
-          <div id="member-bill-info" class="hidden text-xs flex justify-between items-center bg-black/20 px-2.5 py-2 rounded-[10px]">
-            <span class="text-white/60 font-medium">Status:</span>
-            <span id="bill-arrears-status" class="font-semibold text-ios-orange">-</span>
-          </div>
-          <div class="flex items-center justify-between px-1">
-            <span class="text-[13px] font-medium text-white">Berapa Bulan?</span>
-            <div class="flex items-center bg-black/40 rounded-[10px] p-0.5 border border-white/5">
-              <button type="button" id="btn-months-minus" class="w-7 h-7 flex items-center justify-center rounded-[8px] active-spring text-base font-medium">-</button>
-              <span id="tx-months-count" class="w-8 text-center font-bold text-[14px]">1</span>
-              <button type="button" id="btn-months-plus" class="w-7 h-7 flex items-center justify-center rounded-[8px] active-spring text-base font-medium">+</button>
-            </div>
-          </div>
-          <div class="text-[11px] text-center text-ios-blue font-medium bg-ios-blue/10 py-2 rounded-[10px] border border-ios-blue/20" id="tx-dues-period-label">-</div>
-        </div>
-      </div>
-    </div>
+  // Remove loading screen safely
+  setTimeout(function() {
+    var el = document.getElementById('loading-overlay');
+    if (el) { el.style.opacity = '0'; setTimeout(function() { el.style.display = 'none'; }, 300); }
+  }, 400);
+</script>
 
-    <div>
-      <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-0.5">Nominal (Rp)</label>
-      <input type="number" id="tx-amount" required min="1" class="ios-input h-11 text-xl font-bold tracking-tight bg-white/10" placeholder="0">
-    </div>
-
-    <div class="flex gap-2">
-      <div class="w-[120px] shrink-0">
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-0.5">Tanggal</label>
-        <input type="date" id="tx-date" required class="ios-input h-10 bg-white/10 text-[12px]">
-      </div>
-      <div class="flex-1 min-w-0">
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-0.5 truncate">Keterangan</label>
-        <input type="text" id="tx-description" class="ios-input h-10 bg-white/10 placeholder-white/30 text-[12px]" placeholder="Opsional">
-      </div>
-    </div>
-
-    <div class="pt-1">
-       <button type="submit" class="w-full bg-ios-blue text-white py-3 rounded-[16px] font-semibold text-[15px] active-spring">Simpan Transaksi</button>
-    </div>
-  </form>
-</div>
-
-<!-- MODAL MEMBER -->
-<div id="modal-member" class="fixed bottom-0 left-0 right-0 mx-auto z-[101] w-full max-w-md bg-[#1C1C1E] rounded-t-[32px] p-4 modal-sheet shadow-2xl flex flex-col max-h-[90vh] border-t border-white/10">
-  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 shrink-0"></div>
-  <div class="flex justify-between items-center mb-3 shrink-0">
-    <h3 id="modal-member-title" class="text-[20px] font-bold tracking-tight text-white">Tambah Anggota</h3>
-    <button class="btn-close-modals w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white/70 active-spring shrink-0"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-  
-  <form id="form-member" class="space-y-3 overflow-y-auto overscroll-contain pb-4">
-    <input type="hidden" id="member-id">
-    <div>
-      <input type="text" id="member-name" required placeholder="Nama Lengkap" class="ios-input h-10 bg-white/10 text-[13px]">
-    </div>
-    <div>
-      <input type="text" id="member-phone" placeholder="No. WhatsApp" class="ios-input h-10 bg-white/10 text-[13px]">
-    </div>
-    <div>
-      <input type="text" id="member-address" placeholder="Alamat / Blok Rumah" class="ios-input h-10 bg-white/10 text-[13px]">
-    </div>
-    <div>
-      <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-0.5">Tanggal Bergabung</label>
-      <input type="date" id="member-joindate" required class="ios-input h-10 bg-white/10 text-[12px]">
-    </div>
-    <div class="pt-1">
-      <button type="submit" class="w-full bg-ios-blue text-white py-3 rounded-[16px] font-semibold text-[15px] active-spring">Simpan Anggota</button>
-    </div>
-  </form>
-</div>
-
-<!-- MODAL GENERIC -->
-<div id="modal-generic" class="fixed bottom-0 left-0 right-0 mx-auto z-[101] w-full max-w-md bg-[#1C1C1E] rounded-t-[32px] p-4 modal-sheet shadow-2xl flex flex-col max-h-[90vh] border-t border-white/10">
-  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 shrink-0"></div>
-  <div class="flex justify-between items-center mb-3 shrink-0">
-    <h3 id="modal-generic-title" class="text-[20px] font-bold tracking-tight text-white">Form</h3>
-    <button class="btn-close-modals w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white/70 active-spring shrink-0"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-  <div id="modal-generic-content" class="pb-4 overflow-y-auto"></div>
-</div>
-
-<!-- MODAL WHATSAPP REKAP -->
-<div id="modal-whatsapp" class="fixed bottom-0 left-0 right-0 mx-auto z-[101] w-full max-w-md bg-[#1C1C1E] rounded-t-[32px] p-4 modal-sheet shadow-2xl flex flex-col max-h-[90vh] border-t border-white/10">
-  <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3 shrink-0"></div>
-  <div class="flex justify-between items-center mb-3 shrink-0">
-    <h3 id="modal-wa-title" class="text-[20px] font-bold tracking-tight text-white">Laporan WA</h3>
-    <button class="btn-close-modals w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white/70 active-spring shrink-0"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-  
-  <div class="space-y-2 mb-3">
-    <div id="wa-tracking-link-wrapper">
-      <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-0.5">Link Web / Aplikasi (Opsional)</label>
-      <input type="url" id="wa-tracking-link-input" class="ios-input h-9 text-[12px] bg-white/10" placeholder="https://paguyuban-wongtulus.github.io/BranKAS/">
-    </div>
-    <div>
-      <label class="text-[10px] font-semibold uppercase tracking-widest text-white/50 ml-1 block mb-0.5">Pratinjau Teks Pesan</label>
-      <textarea id="whatsapp-text-preview" class="ios-input h-44 text-[12px] font-mono text-white/80 resize-none bg-white/10"></textarea>
-    </div>
-  </div>
-
-  <div class="flex gap-2 pb-2 shrink-0">
-    <button id="btn-copy-wa" class="flex-1 bg-[#2C2C2E] text-white py-3 rounded-[14px] font-semibold text-[14px] active-spring flex justify-center items-center"><i class="fa-solid fa-copy mr-1.5"></i> Salin</button>
-    <button id="btn-send-wa" class="flex-1 bg-ios-green text-white py-3 rounded-[14px] font-semibold text-[14px] active-spring flex justify-center items-center"><i class="fa-brands fa-whatsapp mr-1.5 text-base"></i> Kirim</button>
-  </div>
-</div>
-
-<!-- ========================================== -->
-<!-- SCRIPT UTAMA & FIREBASE (ESM BROWSER)      -->
-<!-- ========================================== -->
 <script type="module">
-// DYNAMIC IMPORTS: Mencegah script error ketika CDN Google diblokir / Offline
-let fb = {}; 
+const defaultFirebaseConfig = {
+  apiKey: "AIzaSyBkAWiqLyWvSHfXuPIGJqRKoobFJt-2oUg",
+  authDomain: "brankas-65a4a.firebaseapp.com",
+  projectId: "brankas-65a4a",
+  storageBucket: "brankas-65a4a.firebasestorage.app",
+  messagingSenderId: "494535868249",
+  appId: "1:494535868249:web:4d874373efe4aec755d648"
+};
 
-const CACHE_KEY = 'brankas_v18_scalable_app'; 
+let fb = {}; 
+const CACHE_KEY = 'brankas_v20_scalable_app'; 
 
 let appState = { 
-  transactions: [], 
-  members: [], 
-  users: [], 
-  categories: [], 
-  settings: [], 
-  archives: [], 
-  currentUser: null 
+  transactions: [], members: [], 
+  users: [{ id: 'U-1', username: 'admin', password: '123', role: 'Admin' }], 
+  categories: [], settings: [], archives: [], currentUser: null 
 };
+
+try {
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    if (parsed.users && parsed.users.length > 0) appState.users = parsed.users;
+    appState.members = parsed.members || [];
+    appState.transactions = parsed.transactions || [];
+    appState.categories = parsed.categories || [];
+    appState.settings = parsed.settings || [];
+    appState.archives = parsed.archives || [];
+  }
+} catch(e) {}
+
+if (!appState.users.find(u => String(u.username).trim().toLowerCase() === 'admin')) { 
+    appState.users.push({ id: 'U-1', username: 'admin', password: '123', role: 'Admin' }); 
+}
 
 let duesCalcState = { memberId: '', monthsCount: 1, nominal: 15000, startMonthYear: { month: 1, year: 2026 } };
 let logoTempState = { mode: 'preset', icon: 'fa-vault', color: 'from-ios-blue to-blue-700', imageUrl: '' };
-
 let txPageSize = 15;
 let txCurrentPage = 1;
-let activeUnsubscribers = [];
-let recentActivityInterval = null;
-let currentActivityIndex = 0;
-let liveClockInterval = null;
-let memSearchTimer = null;
+let activeUnsubscribers = []; let recentActivityInterval = null; let currentActivityIndex = 0;
+let liveClockInterval = null; let memSearchTimer = null;
+let db = null; let isFirebaseOnline = false; let isDbSeeded = false;
+let isTxSelectionMode = false;
 
-let db = null;
-let authUser = null;
+// Second fallback guarantee for Logo rendering
+const cachedLogoSetting = (appState.settings || []).find(s => s.key === 'app_logo');
+if (cachedLogoSetting) renderGlobalAppLogo(cachedLogoSetting);
 
-// ===============================================================
-// PENYIMPANAN LOGIC KREDENSIAL LOKAL
-// ===============================================================
-function getFirebaseConfig() {
-  const savedConfigStr = localStorage.getItem('brankas_firebase_config');
-  if (savedConfigStr) return JSON.parse(savedConfigStr);
-  return null;
-}
+let currentMemberFilter = 'all';
+window.setMemberFilter = function(filter) {
+  if (currentMemberFilter === filter) currentMemberFilter = 'all';
+  else currentMemberFilter = filter;
+  renderMembers();
+};
+
+let customConfirmCallback = null;
+window.showConfirm = function(msg, onConfirm) {
+  document.getElementById('confirm-msg').innerText = msg;
+  customConfirmCallback = onConfirm;
+  const m = document.getElementById('modal-confirm');
+  m.classList.remove('hidden'); requestAnimationFrame(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); });
+};
+window.closeConfirm = function() {
+  const m = document.getElementById('modal-confirm');
+  m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300);
+};
 
 function getCollectionRef(colName) { return fb.collection(db, colName); }
 function getDocRef(colName, docId) { return fb.doc(db, colName, docId); }
 
-function updateNetworkStatusBadge(status) {
-  const badge = document.getElementById('firebase-status-badge');
+function showToast(message, type = 'success') {
+  const t = document.getElementById('dynamic-island-toast');
+  const ic = document.getElementById('toast-icon');
+  document.getElementById('toast-message').innerText = message;
+  t.classList.remove('hide'); t.classList.add('show');
+  
+  if(type === 'success') {
+    ic.innerHTML = '<i class="fa-solid fa-check text-[10px]"></i>';
+    ic.className = 'flex items-center justify-center w-4 h-4 rounded-full shrink-0 bg-ios-green text-white';
+  } else {
+    ic.innerHTML = '<i class="fa-solid fa-info text-[10px]"></i>';
+    ic.className = 'flex items-center justify-center w-4 h-4 rounded-full shrink-0 bg-ios-orange text-white';
+  }
+  setTimeout(() => { t.classList.remove('show'); t.classList.add('hide'); }, 3500);
+}
+
+function updateNetworkStatus(statusType, errorMessage = '') {
   const dot = document.getElementById('firebase-status-dot');
   const text = document.getElementById('firebase-status-text');
-  if(!badge || !dot || !text) return;
-
-  if (status === 'online') {
-    badge.className = "flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-ios-green/15 border border-ios-green/30 text-ios-green text-[8px] font-bold uppercase tracking-wider shrink-0 transition-all duration-300";
-    dot.className = "w-1.5 h-1.5 rounded-full bg-ios-green animate-pulse";
+  const appWrap = document.getElementById('app-wrapper');
+  if(!dot || !text) return;
+  
+  if(statusType === 'online') {
+    dot.className = "w-2 h-2 rounded-full bg-ios-green animate-pulseGlow shadow-[0_0_10px_#32D74B]";
     text.innerText = "Online";
-  } else if (status === 'connecting') {
-    badge.className = "flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-ios-orange/15 border border-ios-orange/30 text-ios-orange text-[8px] font-bold uppercase tracking-wider shrink-0 transition-all duration-300";
-    dot.className = "w-1.5 h-1.5 rounded-full bg-ios-orange animate-ping";
-    text.innerText = "Connecting";
+    text.className = "text-[10px] text-ios-green font-bold tracking-tight drop-shadow-sm";
+    appWrap.classList.remove('sync-mode-active');
+  } else if(statusType === 'syncing') {
+    dot.className = "w-2 h-2 rounded-full bg-ios-blue animate-syncWave shadow-[0_0_10px_#0A84FF]";
+    text.innerText = "Menyelaraskan...";
+    text.className = "text-[10px] text-ios-blue font-bold tracking-tight drop-shadow-sm";
+    appWrap.classList.add('sync-mode-active');
+  } else if(statusType === 'connecting') {
+    dot.className = "w-2 h-2 rounded-full bg-ios-orange animate-spinFast shadow-[0_0_10px_#FF9F0A]";
+    text.innerText = "Menghubungkan...";
+    text.className = "text-[10px] text-ios-orange font-bold tracking-tight drop-shadow-sm";
+    appWrap.classList.remove('sync-mode-active');
   } else {
-    badge.className = "flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-ios-gray/15 border border-ios-gray/30 text-ios-gray text-[8px] font-bold uppercase tracking-wider shrink-0 transition-all duration-300";
-    dot.className = "w-1.5 h-1.5 rounded-full bg-ios-gray";
+    dot.className = "w-2 h-2 rounded-full bg-ios-red shadow-[0_0_8px_#FF453A]";
     text.innerText = "Offline";
+    text.className = "text-[10px] text-ios-red font-bold tracking-tight drop-shadow-sm";
+    appWrap.classList.remove('sync-mode-active');
+    if (errorMessage) showToast(errorMessage, 'error');
   }
 }
 
 async function initFirebaseAndApp() {
-  updateNetworkStatusBadge('connecting');
-  
-  const activeConfig = getFirebaseConfig();
+    updateNetworkStatus('connecting');
 
-  // Safety Timer (1.5 Detik).
-  const safetyTimer = setTimeout(() => {
-    updateNetworkStatusBadge('offline');
-    loadLocalFallbackData();
-    showToast('Mode Lokal Diaktifkan (Offline)', 'error');
-  }, 1500);
+    if (!navigator.onLine) {
+        updateNetworkStatus('offline', 'Sinyal terputus. Mode Lokal Aktif.');
+        isFirebaseOnline = false;
+        return;
+    }
 
-  if (!activeConfig || !activeConfig.apiKey || activeConfig.apiKey === '') {
-    // Tanpa config, diam-diam langsung pakai fallback
-    clearTimeout(safetyTimer);
-    updateNetworkStatusBadge('offline');
-    loadLocalFallbackData();
-    return;
-  }
+    try {
+        const fetchWithTimeout = Promise.race([
+            Promise.all([
+                import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"),
+                import("https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"),
+                import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js")
+            ]),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
+        ]);
 
-  try {
-    // Dynamic import to prevent script parsing halt
-    const [appMod, authMod, fsMod] = await Promise.all([
-        import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"),
-        import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js")
-    ]);
+        const [appMod, authMod, fsMod] = await fetchWithTimeout;
+        
+        fb = { ...appMod, ...authMod, ...fsMod };
+        const app = fb.initializeApp(defaultFirebaseConfig);
+        
+        try {
+            db = fb.initializeFirestore(app, {
+                localCache: fb.persistentLocalCache({tabManager: fb.persistentMultipleTabManager()})
+            });
+        } catch (e) {
+            db = fb.getFirestore(app);
+        }
+        
+        const auth = fb.getAuth(app);
+        try { await fb.signInAnonymously(auth); } catch(e) { throw new Error('auth_failed'); }
 
-    fb.initializeApp = appMod.initializeApp;
-    fb.getAuth = authMod.getAuth;
-    fb.signInAnonymously = authMod.signInAnonymously;
-    fb.getFirestore = fsMod.getFirestore;
-    fb.doc = fsMod.doc;
-    fb.deleteDoc = fsMod.deleteDoc;
-    fb.onSnapshot = fsMod.onSnapshot;
-    fb.collection = fsMod.collection;
-    fb.getDocs = fsMod.getDocs;
-    fb.setDoc = fsMod.setDoc;
-    fb.query = fsMod.query;
-    fb.where = fsMod.where;
-    fb.orderBy = fsMod.orderBy;
-    fb.limitQuery = fsMod.limit;
+        isFirebaseOnline = true;
+        updateNetworkStatus('online');
+        
+        setupRealtimeListeners();
+        checkAndSeedInitialData();
 
-    const app = fb.initializeApp(activeConfig);
-    db = fb.getFirestore(app);
-    const auth = fb.getAuth(app);
-    
-    const userCred = await fb.signInAnonymously(auth);
-    authUser = userCred.user;
+        window.addEventListener('online', () => { 
+          isFirebaseOnline = true; 
+          updateNetworkStatus('syncing'); 
+          showToast('Sinyal Pulih. Menyinkronkan data...', 'success'); 
+          setTimeout(() => updateNetworkStatus('online'), 2500);
+        });
+        window.addEventListener('offline', () => { 
+          isFirebaseOnline = false; 
+          updateNetworkStatus('offline', 'Offline Mode. Data ditabung sementara.'); 
+        });
 
-    clearTimeout(safetyTimer);
-    setupRealtimeListeners();
-  } catch (err) {
-    clearTimeout(safetyTimer);
-    updateNetworkStatusBadge('offline');
-    loadLocalFallbackData();
-    showToast('Kredensial Firebase tidak valid / Offline. Masuk mode lokal.', 'error');
-    console.error("Firebase Init Error:", err);
-  }
+    } catch (err) {
+        isFirebaseOnline = false;
+        if (err.message === 'timeout') {
+            updateNetworkStatus('offline', 'Koneksi Server Lambat. Mode Lokal Aktif.');
+        } else if (err.message === 'auth_failed') {
+            updateNetworkStatus('offline', 'Aturan Rules Belum Diizinkan (Firebase).');
+        } else {
+            updateNetworkStatus('offline', 'Gagal Mengunduh Script Firebase.');
+        }
+    }
 }
 
-function clearActiveListeners() {
-  activeUnsubscribers.forEach(unsub => { if(typeof unsub === 'function') unsub(); });
-  activeUnsubscribers = [];
-}
+function clearActiveListeners() { activeUnsubscribers.forEach(unsub => { if(typeof unsub === 'function') unsub(); }); activeUnsubscribers = []; }
 
 function setupRealtimeListeners() {
-  if (!db || !authUser) {
-    updateNetworkStatusBadge('offline');
-    loadLocalFallbackData();
-    return;
-  }
-
+  if (!db) return;
   clearActiveListeners();
-  let collectionsLoaded = 0;
-  const totalCollections = 5;
-
-  const onCollectionUpdated = () => {
-    collectionsLoaded++;
-    if (collectionsLoaded >= totalCollections) {
-      updateNetworkStatusBadge('online');
-      checkAndSeedInitialData();
-    }
+  
+  const cb = () => { if (appState.currentUser) refreshCurrentView(); };
+  const errCb = (e) => { 
+      if(e.code === 'permission-denied') updateNetworkStatus('offline', 'Aturan Rules Belum Diizinkan');
+      else if(e.code === 'not-found') updateNetworkStatus('offline', 'Anda Belum Membuat Database Firestore');
   };
 
-  const now = new Date();
-  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  
-  const txQuery = fb.query(
-    getCollectionRef('transactions'),
-    fb.where('date', '>=', `${currentMonthStr}-01`),
-    fb.orderBy('date', 'desc'),
-    fb.limitQuery(100)
-  );
-
-  const unsubTx = fb.onSnapshot(txQuery, snapshot => {
-    const txs = [];
-    snapshot.forEach(docSnap => txs.push({ id: docSnap.id, ...docSnap.data() }));
-    appState.transactions = txs;
-    localStorage.setItem(CACHE_KEY, JSON.stringify(appState));
-    if (appState.currentUser) refreshCurrentView();
-    onCollectionUpdated();
-  }, (err) => {
-    const simpleTxQuery = fb.query(getCollectionRef('transactions'), fb.limitQuery(100));
-    const unsubSimple = fb.onSnapshot(simpleTxQuery, snapshot => {
-      const txs = [];
-      snapshot.forEach(docSnap => txs.push({ id: docSnap.id, ...docSnap.data() }));
-      appState.transactions = txs;
-      localStorage.setItem(CACHE_KEY, JSON.stringify(appState));
-      if (appState.currentUser) refreshCurrentView();
-      onCollectionUpdated();
-    }, () => { onCollectionUpdated(); updateNetworkStatusBadge('offline'); });
-    activeUnsubscribers.push(unsubSimple);
-  });
-  activeUnsubscribers.push(unsubTx);
-
-  const unsubMembers = fb.onSnapshot(fb.query(getCollectionRef('members'), fb.limitQuery(500)), snapshot => {
-    const mems = [];
-    snapshot.forEach(docSnap => mems.push({ id: docSnap.id, ...docSnap.data() }));
-    appState.members = mems;
-    localStorage.setItem(CACHE_KEY, JSON.stringify(appState));
-    if (appState.currentUser) refreshCurrentView();
-    onCollectionUpdated();
-  }, () => { onCollectionUpdated(); updateNetworkStatusBadge('offline'); });
-  activeUnsubscribers.push(unsubMembers);
-
-  const unsubUsers = fb.onSnapshot(getCollectionRef('users'), snapshot => {
-    const usrs = [];
-    snapshot.forEach(docSnap => usrs.push({ id: docSnap.id, ...docSnap.data() }));
-    appState.users = usrs.length > 0 ? usrs : [{ id: 'U-1', username: 'admin', password: '123', role: 'Admin' }];
-    localStorage.setItem(CACHE_KEY, JSON.stringify(appState));
-    if (appState.currentUser) refreshCurrentView();
-    onCollectionUpdated();
-  }, () => { onCollectionUpdated(); updateNetworkStatusBadge('offline'); });
-  activeUnsubscribers.push(unsubUsers);
-
-  const unsubCategories = fb.onSnapshot(getCollectionRef('categories'), snapshot => {
-    const cats = [];
-    snapshot.forEach(docSnap => cats.push({ id: docSnap.id, ...docSnap.data() }));
-    appState.categories = cats;
-    localStorage.setItem(CACHE_KEY, JSON.stringify(appState));
-    if (appState.currentUser) refreshCurrentView();
-    onCollectionUpdated();
-  }, () => { onCollectionUpdated(); updateNetworkStatusBadge('offline'); });
-  activeUnsubscribers.push(unsubCategories);
-
-  const unsubSettings = fb.onSnapshot(getCollectionRef('settings'), snapshot => {
-    const sets = [];
-    snapshot.forEach(docSnap => sets.push({ id: docSnap.id, ...docSnap.data() }));
-    appState.settings = sets;
-    
-    const nomSetting = appState.settings.find(s => s.key === 'nominal_iuran');
-    if (nomSetting) {
-      duesCalcState.nominal = Number(nomSetting.value) || 15000;
-    }
-
-    const logoSetting = appState.settings.find(s => s.key === 'app_logo');
-    if (logoSetting) {
-      renderGlobalAppLogo(logoSetting);
-    }
-
-    localStorage.setItem(CACHE_KEY, JSON.stringify(appState));
-    if (appState.currentUser) refreshCurrentView();
-    onCollectionUpdated();
-  }, () => { onCollectionUpdated(); updateNetworkStatusBadge('offline'); });
-  activeUnsubscribers.push(unsubSettings);
+  activeUnsubscribers.push(fb.onSnapshot(getCollectionRef('transactions'), snap => { appState.transactions = snap.docs.map(d => ({ id: d.id, ...d.data() })); localStorage.setItem(CACHE_KEY, JSON.stringify(appState)); cb(); }, errCb));
+  activeUnsubscribers.push(fb.onSnapshot(getCollectionRef('members'), snap => { appState.members = snap.docs.map(d => ({ id: d.id, ...d.data() })); localStorage.setItem(CACHE_KEY, JSON.stringify(appState)); cb(); }, errCb));
+  activeUnsubscribers.push(fb.onSnapshot(getCollectionRef('users'), snap => { if (!snap.empty) { appState.users = snap.docs.map(d => ({ id: d.id, ...d.data() })); localStorage.setItem(CACHE_KEY, JSON.stringify(appState)); cb(); } }, errCb));
+  activeUnsubscribers.push(fb.onSnapshot(getCollectionRef('categories'), snap => { appState.categories = snap.docs.map(d => ({ id: d.id, ...d.data() })); localStorage.setItem(CACHE_KEY, JSON.stringify(appState)); cb(); }, errCb));
+  activeUnsubscribers.push(fb.onSnapshot(getCollectionRef('settings'), snap => {
+    appState.settings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const nomSetting = appState.settings.find(s => s.key === 'nominal_iuran'); if (nomSetting) duesCalcState.nominal = Number(nomSetting.value) || 15000;
+    const logoSetting = appState.settings.find(s => s.key === 'app_logo'); if (logoSetting) renderGlobalAppLogo(logoSetting);
+    localStorage.setItem(CACHE_KEY, JSON.stringify(appState)); cb();
+  }, errCb));
+  activeUnsubscribers.push(fb.onSnapshot(getCollectionRef('archives'), snap => { appState.archives = snap.docs.map(d => ({ id: d.id, ...d.data() })); localStorage.setItem(CACHE_KEY, JSON.stringify(appState)); cb(); }, errCb));
 }
 
 async function checkAndSeedInitialData() {
-  if (!db || !authUser) return;
+  if (!db || isDbSeeded || !isFirebaseOnline) return;
+  isDbSeeded = true; 
   try {
-    const userSnap = await fb.getDocs(getCollectionRef('users'));
+    const userSnap = await fb.getDocs(fb.query(getCollectionRef('users'), fb.limit(1)));
     if (userSnap.empty) {
       await fb.setDoc(getDocRef('users', 'U-1'), { username: 'admin', password: '123', role: 'Admin' });
       await fb.setDoc(getDocRef('settings', 'nominal_iuran'), { key: 'nominal_iuran', value: '15000' });
-      await fb.setDoc(getDocRef('settings', 'app_logo'), { key: 'app_logo', mode: 'preset', icon: 'fa-vault', color: 'from-ios-blue to-blue-700' });
-      
       const defaultCats = [
         { id: 'cat-1', type: 'Pemasukan', name: 'Iuran Bulanan' },
         { id: 'cat-2', type: 'Pemasukan', name: 'Sumbangan' },
@@ -962,183 +718,53 @@ async function checkAndSeedInitialData() {
         { id: 'cat-4', type: 'Pengeluaran', name: 'Operasional' },
         { id: 'cat-5', type: 'Pengeluaran', name: 'Konsumsi Rapat' }
       ];
-      for (const cat of defaultCats) {
-        await fb.setDoc(getDocRef('categories', cat.id), cat);
-      }
+      for (const cat of defaultCats) await fb.setDoc(getDocRef('categories', cat.id), cat);
     }
   } catch(e) {}
 }
 
-function loadLocalFallbackData() {
-  try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      appState = { ...appState, ...parsed };
-    }
-  } catch(e) {}
-
-  if (!appState.users || appState.users.length === 0) {
-    const curY = new Date().getFullYear();
-    const curM = String(new Date().getMonth() + 1).padStart(2, '0');
-    appState = {
-      users: [{ id: 'U-1', username: 'admin', password: '123', role: 'Admin' }],
-      members: [
-        { id: 'M-1', name: 'Bpk. Budi Santoso (Data Demo Lokal)', phone: '081234567890', address: 'Blok A1 No. 5', joinDate: '2023-01-01', lastPaid: `${curY}-${String(new Date().getMonth()).padStart(2, '0')}` },
-        { id: 'M-2', name: 'Ibu Siti Aisyah', phone: '081987654321', address: 'Blok B2 No. 8', joinDate: '2023-05-10', lastPaid: `${curY}-${curM}` }
-      ],
-      categories: [
-        { id: 'cat-1', type: 'Pemasukan', name: 'Iuran Bulanan' }, 
-        { id: 'cat-2', type: 'Pemasukan', name: 'Sumbangan' }, 
-        { id: 'cat-3', type: 'Pemasukan', name: 'Saldo Awal/Pindahan' }, 
-        { id: 'cat-4', type: 'Pengeluaran', name: 'Operasional' }
-      ],
-      settings: [
-        { id: 'nominal_iuran', key: 'nominal_iuran', value: '15000' },
-        { id: 'app_logo', key: 'app_logo', mode: 'preset', icon: 'fa-vault', color: 'from-ios-blue to-blue-700' }
-      ],
-      archives: [],
-      transactions: []
-    };
-  }
-}
-
-function getLocalDateString(d = new Date()) {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function isYearLocked(yearStr) {
-  if (!yearStr) return false;
-  const targetYear = parseInt(String(yearStr).split('-')[0], 10);
-  const archive = (appState.archives || []).find(a => parseInt(a.year, 10) === targetYear);
-  return archive ? archive.isLocked === true : false;
-}
-
-function setSmartGreeting() {
-  const hour = new Date().getHours();
-  let greeting = 'Halo';
-  if (hour >= 4 && hour < 11) greeting = 'Selamat Pagi';
-  else if (hour >= 11 && hour < 15) greeting = 'Selamat Siang';
-  else if (hour >= 15 && hour < 18) greeting = 'Selamat Sore';
-  else greeting = 'Selamat Malam';
-  const label = document.getElementById('dash-greeting-label');
-  if (label) label.innerText = greeting;
-}
-
-let toastTimer = null;
-function showToast(msg, type = 'success') {
-  const toast = document.getElementById('dynamic-island-toast');
-  const iconBox = document.getElementById('toast-icon');
-  const msgBox = document.getElementById('toast-message');
-  if(!toast || !iconBox || !msgBox) return;
-  
-  if(type === 'success') {
-      iconBox.className = "flex items-center justify-center w-5 h-5 rounded-full bg-ios-green text-black shrink-0";
-      iconBox.innerHTML = '<i class="fa-solid fa-check text-[10px]"></i>';
-  } else {
-      iconBox.className = "flex items-center justify-center w-5 h-5 rounded-full bg-ios-red text-white shrink-0";
-      iconBox.innerHTML = '<i class="fa-solid fa-xmark text-[10px]"></i>';
-  }
-  
-  msgBox.innerText = msg;
-  toast.classList.remove('hide');
-  toast.classList.add('show');
-  
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove('show');
-    toast.classList.add('hide');
-  }, 2800);
-}
-
-function showConfirm(msg, callback) {
-  document.getElementById('modal-generic-title').innerText = 'Konfirmasi';
-  document.getElementById('modal-generic-content').innerHTML = `
-    <div class="flex flex-col items-center p-2">
-      <div class="w-12 h-12 bg-ios-orange/20 text-ios-orange rounded-full flex items-center justify-center text-xl mb-3"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <p class="text-[14px] text-center font-medium text-white mb-5 leading-snug">${msg}</p>
-      <div class="flex gap-2 w-full">
-        <button id="btn-modal-cancel" class="flex-1 bg-[#2C2C2E] text-white py-2.5 rounded-[14px] font-semibold active-spring text-[14px]">Batal</button>
-        <button id="btn-modal-proceed" class="flex-1 bg-ios-red text-white py-2.5 rounded-[14px] font-semibold active-spring text-[14px]">Ya, Lanjutkan</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('modal-generic').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-  document.getElementById('app-wrapper').classList.add('modal-active');
-  requestAnimationFrame(() => document.getElementById('modal-backdrop').classList.add('opacity-100'));
-  
-  document.getElementById('btn-modal-cancel').onclick = closeAllModals;
-  document.getElementById('btn-modal-proceed').onclick = () => { closeAllModals(); setTimeout(callback, 300); };
-}
-
-// Global handleLogin yang kebal dari crash scope module
-window.handleLogin = function(e) {
-  if(e) e.preventDefault();
+function handleLogin() {
   const u = String(document.getElementById('login-username').value).trim().toLowerCase();
   const p = String(document.getElementById('login-password').value).trim();
   const errEl = document.getElementById('login-error');
-  
-  const user = appState.users.find(usr => String(usr.username||'').trim().toLowerCase() === u && String(usr.password||'').trim() === p);
-  
+  if (!u || !p) return false;
+
+  let user = (appState.users || []).find(usr => String(usr.username || '').trim().toLowerCase() === u && String(usr.password || '').trim() === p);
+  if(!user && u === 'admin' && p === '123') user = { id: 'U-1', username: 'admin', password: '123', role: 'Admin' };
+
   if (user) {
-    appState.currentUser = user;
-    errEl.classList.add('hidden');
+    appState.currentUser = user; errEl.classList.add('hidden');
     document.getElementById('login-view').classList.add('hidden');
     document.getElementById('app-wrapper').classList.remove('hidden');
     
-    const waBtn = document.getElementById('btn-wa-report');
-    const waStatusBtn = document.getElementById('btn-wa-members-status');
-    if (user.role === 'Admin') {
-      document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden', '!hidden'));
-      if(waBtn) waBtn.classList.remove('hidden', '!hidden');
-      if(waStatusBtn) waStatusBtn.classList.remove('hidden', '!hidden');
-    } else {
-      document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden', '!hidden'));
-      if(waBtn) waBtn.classList.add('hidden', '!hidden');
-      if(waStatusBtn) waStatusBtn.classList.add('hidden', '!hidden');
-    }
+    // Ensure logo matches settings on login screen entry
+    const logoSetting = (appState.settings || []).find(s => s.key === 'app_logo');
+    if (logoSetting) renderGlobalAppLogo(logoSetting);
+
+    if (user.role === 'Admin') document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden', '!hidden'));
+    else document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden', '!hidden'));
     
-    switchTab('dashboard');
-    showToast(`Berhasil Masuk!`, 'success');
+    switchTab('dashboard'); showToast(`Selamat datang!`, 'success');
   } else {
-    errEl.innerText = "Username atau Password salah";
-    errEl.classList.remove('hidden');
+    errEl.innerText = "Sandi atau Username salah"; errEl.classList.remove('hidden');
   }
 }
 
 function handleLogout() {
-  appState.currentUser = null;
-  document.getElementById('app-wrapper').classList.add('hidden');
-  document.getElementById('login-view').classList.remove('hidden');
-  document.getElementById('login-form').reset();
+  appState.currentUser = null; document.getElementById('app-wrapper').classList.add('hidden');
+  document.getElementById('login-view').classList.remove('hidden'); document.getElementById('login-form').reset();
 }
 
 let activeTab = 'dashboard';
 function switchTab(tabId) {
-  activeTab = tabId;
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-  const el = document.getElementById('tab-' + tabId);
-  if(!el) return;
-  el.classList.remove('hidden', 'tab-enter');
-  
-  void el.offsetWidth;
-  el.classList.add('tab-enter');
+  activeTab = tabId; document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  const el = document.getElementById('tab-' + tabId); if(!el) return;
+  el.classList.remove('hidden', 'tab-enter'); void el.offsetWidth; el.classList.add('tab-enter');
 
   ['dashboard', 'transactions', 'members', 'reports'].forEach(id => {
     const btn = document.getElementById('botnav-' + id);
-    if(btn) {
-      if(id === tabId) {
-        btn.classList.add('text-white'); btn.classList.remove('text-white/40');
-      } else {
-        btn.classList.add('text-white/40'); btn.classList.remove('text-white');
-      }
-    }
+    if(btn) { if(id === tabId) { btn.classList.add('text-white'); btn.classList.remove('text-white/40'); } else { btn.classList.add('text-white/40'); btn.classList.remove('text-white'); } }
   });
-
   requestAnimationFrame(() => refreshCurrentView());
 }
 
@@ -1147,18 +773,19 @@ function refreshCurrentView() {
   else if (activeTab === 'transactions') renderTransactions(); 
   else if (activeTab === 'members') renderMembers();
   else if (activeTab === 'reports') renderReports();
-  else if (activeTab === 'settings') renderSettings();
 }
 
-function formatRp(amount) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount); }
+function formatRp(amount) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(amount) || 0); }
 function formatDateIndo(dateStr) {
-  if(!dateStr) return '-';
-  const p = dateStr.split('-');
-  if(p.length !== 3) return dateStr;
+  if(!dateStr || !dateStr.includes('-')) return dateStr || '-';
+  const p = dateStr.split('-'); if(p.length !== 3) return dateStr;
   const m = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][parseInt(p[1],10)-1];
-  return `${parseInt(p[2],10)} ${m} ${p[0]}`;
+  return `${parseInt(p[2],10)} ${m} ${p[0].substring(2)}`;
 }
-
+function isYearLocked(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string' || !dateStr.includes('-')) return false;
+  const yr = parseInt(dateStr.split('-')[0], 10); const arch = (appState.archives || []).find(a => parseInt(a.year, 10) === yr); return arch && arch.isLocked;
+}
 function getCategoryIcon(catName) {
     const c = String(catName).toLowerCase();
     if(c.includes('iuran')) return '<i class="fa-solid fa-users"></i>';
@@ -1171,152 +798,71 @@ function getCategoryIcon(catName) {
 }
 
 function getMemberDuesStatus(member) {
-  const now = new Date();
-  const curM = now.getMonth() + 1, curY = now.getFullYear();
+  const now = new Date(); const curM = now.getMonth() + 1, curY = now.getFullYear();
   let lastYM = null;
-  
   if (member.lastPaid && member.lastPaid.includes('-')) {
-    const p = member.lastPaid.split('-');
-    lastYM = { year: parseInt(p[0], 10), month: parseInt(p[1], 10) };
+    const p = member.lastPaid.split('-'); lastYM = { year: parseInt(p[0], 10), month: parseInt(p[1], 10) };
   } else if (member.joinDate && member.joinDate.includes('-')) {
     const p = member.joinDate.split('-');
-    if(p.length >= 2) {
-      let jY = parseInt(p[0], 10), jM = parseInt(p[1], 10);
-      lastYM = jM === 1 ? { year: jY - 1, month: 12 } : { year: jY, month: jM - 1 };
-    }
+    if(p.length >= 2) { let jY = parseInt(p[0], 10), jM = parseInt(p[1], 10); lastYM = jM === 1 ? { year: jY - 1, month: 12 } : { year: jY, month: jM - 1 }; }
   }
-  
   if (!lastYM) lastYM = { year: curY, month: curM - 1 };
 
   const diff = (curY - lastYM.year) * 12 + (curM - lastYM.month);
-  
   const unpaidMonths = [];
   if (diff > 0) {
-    const monthNamesIndo = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-    let iterY = lastYM.year;
-    let iterM = lastYM.month;
-    for (let i = 0; i < diff; i++) {
-      iterM++;
-      if (iterM > 12) { iterM = 1; iterY++; }
-      unpaidMonths.push(`${monthNamesIndo[iterM - 1]} ${iterY}`);
-    }
+    const mn = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    let iterY = lastYM.year, iterM = lastYM.month;
+    for (let i = 0; i < diff; i++) { iterM++; if (iterM > 12) { iterM = 1; iterY++; } unpaidMonths.push(`${mn[iterM - 1]} ${iterY}`); }
   }
-
   return { lastYM, arrears: Math.max(0, diff), isPaid: diff <= 0, unpaidMonths };
 }
 
-function isMemberPaidForMonth(member, targetYear, targetMonth) {
-  if (!member) return false;
-  let lastYM = null;
-  
-  if (member.lastPaid && member.lastPaid.includes('-')) {
-    const p = member.lastPaid.split('-');
-    lastYM = { year: parseInt(p[0], 10), month: parseInt(p[1], 10) };
-  } else if (member.joinDate && member.joinDate.includes('-')) {
-    const p = member.joinDate.split('-');
-    if(p.length >= 2) {
-      let jY = parseInt(p[0], 10), jM = parseInt(p[1], 10);
-      lastYM = jM === 1 ? { year: jY - 1, month: 12 } : { year: jY, month: jM - 1 };
-    }
-  }
-  
-  if (!lastYM) return false;
-
-  const targetValue = targetYear * 12 + targetMonth;
-  const lastPaidValue = lastYM.year * 12 + lastYM.month;
-
-  return lastPaidValue >= targetValue;
-}
-
-function isIuran(catName) {
-  if(!catName) return false;
-  const n = String(catName).toLowerCase();
-  return n.includes('iuran') || n.includes('bulanan') || n.includes('wajib');
-}
+function isIuran(catName) { if(!catName) return false; const n = String(catName).toLowerCase(); return n.includes('iuran') || n.includes('bulanan') || n.includes('wajib'); }
 
 function renderDashboard() {
-  const now = new Date();
-  const curY = now.getFullYear(), curMStr = String(now.getMonth() + 1).padStart(2, '0');
-  
+  const now = new Date(); const curY = now.getFullYear(), curMStr = String(now.getMonth() + 1).padStart(2, '0');
   updateLiveDashboardDate();
-  if (liveClockInterval) clearInterval(liveClockInterval);
-  liveClockInterval = setInterval(updateLiveDashboardDate, 1000);
+  if (liveClockInterval) clearInterval(liveClockInterval); liveClockInterval = setInterval(updateLiveDashboardDate, 1000);
 
   let tIn = 0, tOut = 0, mIn = 0, mOut = 0;
   const currentMonthPrefix = `${curY}-${curMStr}`;
-  const sortedTx = [...appState.transactions]
-    .sort((a,b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 8); 
+  const sortedTx = [...(appState.transactions || [])].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 8); 
 
-  appState.transactions.forEach(t => {
+  (appState.transactions || []).forEach(t => {
     const am = Number(t.amount) || 0;
-    if (t.type === 'Pemasukan') {
-      tIn += am;
-      if (String(t.date).startsWith(currentMonthPrefix)) mIn += am;
-    } else {
-      tOut += am;
-      if (String(t.date).startsWith(currentMonthPrefix)) mOut += am;
-    }
+    if (t.type === 'Pemasukan') { tIn += am; if (String(t.date).startsWith(currentMonthPrefix)) mIn += am; } 
+    else { tOut += am; if (String(t.date).startsWith(currentMonthPrefix)) mOut += am; }
   });
 
-  document.getElementById('stat-total-kas').innerText = formatRp(tIn - tOut);
-  document.getElementById('stat-in-month').innerText = formatRp(mIn);
-  document.getElementById('stat-out-month').innerText = formatRp(mOut);
+  document.getElementById('stat-total-kas').innerText = formatRp(tIn - tOut); document.getElementById('stat-in-month').innerText = formatRp(mIn); document.getElementById('stat-out-month').innerText = formatRp(mOut);
 
-  if (recentActivityInterval) clearInterval(recentActivityInterval);
-  const sliderContainer = document.getElementById('recent-activity-slider');
-  
-  if(sortedTx.length === 0) {
-    sliderContainer.innerHTML = `<div class="p-3 text-center text-[11px] text-white/40 w-full h-full flex items-center justify-center font-medium uppercase"><i class="fa-solid fa-inbox mr-1.5"></i> Belum ada aktivitas</div>`;
-  } else {
-    currentActivityIndex = 0;
-    renderSingleActivityRow(sortedTx, currentActivityIndex);
-    
-    if (sortedTx.length > 1) {
-      recentActivityInterval = setInterval(() => {
-        currentActivityIndex = (currentActivityIndex + 1) % sortedTx.length;
-        renderSingleActivityRow(sortedTx, currentActivityIndex);
-      }, 4000); 
-    }
-  }
+  if (recentActivityInterval) clearInterval(recentActivityInterval); const sliderContainer = document.getElementById('recent-activity-slider');
+  if(sortedTx.length === 0) { sliderContainer.innerHTML = `<div class="p-2 text-center text-[10px] text-white/40 w-full h-full flex items-center justify-center font-medium uppercase"><i class="fa-solid fa-inbox mr-1.5"></i> Belum ada aktivitas</div>`; } 
+  else { currentActivityIndex = 0; renderSingleActivityRow(sortedTx, currentActivityIndex); if (sortedTx.length > 1) { recentActivityInterval = setInterval(() => { currentActivityIndex = (currentActivityIndex + 1) % sortedTx.length; renderSingleActivityRow(sortedTx, currentActivityIndex); }, 4000); } }
 
-  const unpaid = [];
-  appState.members.forEach(m => {
-    const st = getMemberDuesStatus(m);
-    if (!st.isPaid) unpaid.push({ member: m, status: st });
-  });
-  
-  unpaid.sort((a, b) => b.status.arrears - a.status.arrears);
+  const unpaid = []; (appState.members || []).forEach(m => { const st = getMemberDuesStatus(m); if (!st.isPaid) unpaid.push({ member: m, status: st }); }); unpaid.sort((a, b) => b.status.arrears - a.status.arrears);
 
-  document.getElementById('badge-unpaid-month').innerText = unpaid.length;
-  const unpList = document.getElementById('list-unpaid-month');
-  const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin';
+  document.getElementById('badge-unpaid-month').innerText = unpaid.length; const unpList = document.getElementById('list-unpaid-month'); const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin';
 
   if(unpaid.length === 0) {
-    unpList.innerHTML = `<div class="p-4 text-center flex flex-col items-center justify-center"><div class="w-9 h-9 bg-ios-green/10 text-ios-green flex items-center justify-center rounded-full mb-1.5"><i class="fa-solid fa-face-smile-beam text-lg"></i></div><span class="text-[13px] text-ios-green font-bold">Semua Anggota Lunas!</span></div>`;
+    unpList.innerHTML = `<div class="p-3 text-center flex flex-col items-center justify-center"><div class="w-7 h-7 bg-ios-green/10 text-ios-green flex items-center justify-center rounded-full mb-1"><i class="fa-solid fa-face-smile-beam text-[13px]"></i></div><span class="text-[11px] text-ios-green font-bold">Semua Lunas!</span></div>`;
     document.getElementById('bulk-pay-action-container').classList.add('hidden');
   } else {
     unpList.innerHTML = unpaid.map((u) => `
-      <div class="ios-list-item !py-2">
-        ${isAdmin ? `<div class="flex items-center h-full mr-2.5"><input type="checkbox" class="unpaid-cb w-3.5 h-3.5 rounded border-white/20 accent-ios-blue shrink-0 cursor-pointer" value="${u.member.id}"></div>` : ''}
-        <div class="ios-list-content ${isAdmin ? 'border-none' : ''} min-w-0 !pb-0 !mb-0">
-          <div class="pr-2 flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity btn-show-member-detail" data-member-id="${u.member.id}">
-            <h4 class="text-[13px] font-semibold text-white truncate flex items-center gap-1">${u.member.name} <i class="fa-solid fa-chevron-right text-white/30 text-[8px]"></i></h4>
-            <div class="text-[10px] text-ios-orange font-medium mt-0.5 tracking-wide flex items-center overflow-hidden w-full">
-              <span class="shrink-0 mr-1">Belum:</span> 
-              <span class="text-white/70 truncate">${u.status.unpaidMonths.join(', ')}</span>
-            </div>
+      <div class="ios-list-item !py-1.5 px-2 border-b border-white/5">
+        ${isAdmin ? `<div class="flex items-center h-full mr-2"><input type="checkbox" class="unpaid-cb w-4 h-4 rounded border-white/25 accent-ios-blue shrink-0 cursor-pointer" value="${u.member.id}"></div>` : ''}
+        <div class="ios-list-content border-none min-w-0 !pb-0 !mb-0">
+          <div class="pr-1 flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity btn-show-member-detail" data-member-id="${u.member.id}">
+            <h4 class="text-[12px] font-semibold text-white truncate flex items-center gap-1">${u.member.name}</h4>
+            <div class="text-[9.5px] text-ios-orange font-medium mt-0.5 tracking-wide flex items-center overflow-hidden w-full"><span class="shrink-0 mr-1">Belum bayar:</span><span class="text-white/70 truncate">${u.status.unpaidMonths.join(', ')}</span></div>
           </div>
-          ${isAdmin ? 
-            `<button class="btn-quick-pay px-2.5 py-1 bg-white/15 hover:bg-white/20 text-ios-blue text-[11px] font-semibold rounded-[8px] active-spring shrink-0" data-member-id="${u.member.id}">Bayar</button>` : 
-            `<span class="px-2 py-0.5 bg-ios-red/15 text-ios-red text-[10px] font-semibold rounded-[6px] shrink-0">${u.status.arrears} bln</span>`
-          }
+          ${isAdmin ? `<button class="btn-quick-pay px-2.5 py-1 bg-white/15 hover:bg-white/20 text-ios-blue text-[10px] font-semibold rounded-[7px] active-spring shrink-0 ml-1" data-member-id="${u.member.id}">Bayar</button>` : `<span class="px-2 py-0.5 bg-ios-red/15 text-ios-red text-[9.5px] font-semibold rounded-[5px] shrink-0">${u.status.arrears} bln</span>`}
         </div>
       </div>
     `).join('');
     
     if(isAdmin) document.getElementById('bulk-pay-action-container').classList.remove('hidden');
-
     document.querySelectorAll('.unpaid-cb').forEach(cb => cb.addEventListener('change', updateBulkPayBtn));
     document.querySelectorAll('.btn-show-member-detail').forEach(el => el.addEventListener('click', () => showMemberDetail(el.getAttribute('data-member-id'))));
     document.querySelectorAll('.btn-quick-pay').forEach(btn => btn.addEventListener('click', () => quickPay(btn.getAttribute('data-member-id'))));
@@ -1325,613 +871,426 @@ function renderDashboard() {
 }
 
 function updateLiveDashboardDate() {
-  const now = new Date();
-  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-  
-  const dayName = days[now.getDay()];
-  const dateNum = now.getDate();
-  const monthName = months[now.getMonth()];
-  const yearNum = now.getFullYear();
-  
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  
+  const now = new Date(); const hours = now.getHours();
+  let greetingTime = 'Pagi';
+  if (hours >= 11 && hours < 15) greetingTime = 'Siang';
+  else if (hours >= 15 && hours < 18) greetingTime = 'Sore';
+  else if (hours >= 18 || hours < 4) greetingTime = 'Malam';
+
+  const username = appState.currentUser ? appState.currentUser.username : 'Wongtulus';
+  const greetingEl = document.getElementById('dash-greeting-label');
+  if (greetingEl) greetingEl.innerText = `Selamat ${greetingTime}, ${username}!`;
+
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']; const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const dateLabelEl = document.getElementById('dash-date-label');
-  if (dateLabelEl) {
-    dateLabelEl.innerText = `${dayName}, ${dateNum} ${monthName} ${yearNum} • ${hours}:${minutes} WIB`;
-  }
+  if (dateLabelEl) dateLabelEl.innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} • ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} WIB`;
 }
 
 function renderSingleActivityRow(txs, idx) {
-  const t = txs[idx];
-  if(!t) return;
-  const isOut = t.type === 'Pengeluaran';
-  const sliderContainer = document.getElementById('recent-activity-slider');
-  if(!sliderContainer) return;
-  
-  const icon = getCategoryIcon(t.category);
-  
+  const t = txs[idx]; if(!t) return; const isOut = t.type === 'Pengeluaran'; const sliderContainer = document.getElementById('recent-activity-slider'); if(!sliderContainer) return;
   sliderContainer.innerHTML = `
-    <div class="ios-list-item !py-2 h-full items-center w-full absolute inset-0 animate-slide-up-fade">
-      <div class="w-8 h-8 rounded-full ${isOut ? 'bg-ios-red/15 text-ios-red' : 'bg-ios-green/15 text-ios-green'} flex items-center justify-center mr-2.5 shrink-0 text-xs">
-        ${icon}
-      </div>
-      <div class="flex-1 flex flex-col justify-center min-w-0 pr-1">
-        <span class="text-[13px] font-semibold text-white truncate">${t.category}</span>
-        <p class="text-[11px] text-white/50 font-medium truncate mt-0.5">${t.description || '-'}</p>
-      </div>
-      <div class="shrink-0 text-right pl-1">
-        <span class="text-[13px] font-bold ${isOut ? 'text-white' : 'text-ios-green'} tracking-tight">${isOut ? '-' : '+'}${formatRp(t.amount)}</span>
-      </div>
+    <div class="ios-list-item !py-1 h-full items-center w-full absolute inset-0 animate-slide-up-fade px-2">
+      <div class="w-7 h-7 rounded-full ${isOut ? 'bg-ios-red/15 text-ios-red' : 'bg-ios-green/15 text-ios-green'} flex items-center justify-center mr-2 shrink-0 text-[11px]">${getCategoryIcon(t.category)}</div>
+      <div class="flex-1 flex flex-col justify-center min-w-0 pr-1"><span class="text-[11px] font-semibold text-white truncate">${t.category}</span><p class="text-[9.5px] text-white/50 font-medium truncate mt-0.5">${t.description || '-'}</p></div>
+      <div class="shrink-0 text-right pl-1"><span class="text-[11px] font-bold ${isOut ? 'text-white' : 'text-ios-green'} tracking-tight">${isOut ? '-' : '+'}${formatRp(t.amount)}</span></div>
     </div>
   `;
 }
 
 function updateBulkPayBtn() {
-  const checked = document.querySelectorAll('.unpaid-cb:checked').length;
-  const btn = document.getElementById('bulk-pay-btn-text');
-  if(btn) btn.innerText = checked > 0 ? `Bayar 1 Bln (${checked} Terpilih)` : 'Pilih Anggota di atas';
+  const checked = document.querySelectorAll('.unpaid-cb:checked').length; const btn = document.getElementById('bulk-pay-btn-text');
+  if(btn) btn.innerText = checked > 0 ? `Lunasi 1 Bln (${checked} Orang)` : 'Pilih Anggota di atas';
 }
 
 function executeDashboardBulkPay() {
-  const boxes = document.querySelectorAll('.unpaid-cb:checked');
-  if(boxes.length === 0) return showToast('Pilih minimal 1 anggota', 'error');
-
-  const today = getLocalDateString();
-  if (isYearLocked(today)) {
-    return showToast('Tahun transaksi ini dikunci/diarsip!', 'error');
-  }
-
+  const boxes = document.querySelectorAll('.unpaid-cb:checked'); if(boxes.length === 0) return showToast('Pilih min. 1 anggota', 'error');
+  const today = new Date().toISOString().split('T')[0]; if (isYearLocked(today)) return showToast('Tahun transaksi ini dikunci!', 'error');
   let cCat = appState.categories.find(c => c.type === 'Pemasukan' && isIuran(c.name))?.name || 'Iuran Bulanan';
   
   boxes.forEach(cb => {
     const m = appState.members.find(x => x.id === cb.value);
     if(m) {
-      const st = getMemberDuesStatus(m);
-      let ty = st.lastYM.year, tm = st.lastYM.month + 1;
-      if(tm > 12) { tm = 1; ty++; }
-      
-      const pBln = st.unpaidMonths.length > 0 ? st.unpaidMonths[0] : '';
-      
-      const newLastPaid = `${ty}-${String(tm).padStart(2, '0')}`;
-      const newTx = {
-        id: 'TX-' + Date.now() + Math.floor(Math.random()*100),
-        date: today, type: 'Pemasukan', category: cCat, amount: duesCalcState.nominal,
-        description: `${cCat} ${pBln} (${m.name})`
-      };
-
-      saveMemberToFirebase({ ...m, lastPaid: newLastPaid });
-      saveTransactionToFirebase(newTx);
+      const st = getMemberDuesStatus(m); let ty = st.lastYM.year, tm = st.lastYM.month + 1; if(tm > 12) { tm = 1; ty++; }
+      const pBln = st.unpaidMonths.length > 0 ? st.unpaidMonths[0] : ''; const newLastPaid = `${ty}-${String(tm).padStart(2, '0')}`;
+      const newTx = { id: 'TX-' + Date.now() + Math.floor(Math.random()*100), date: today, type: 'Pemasukan', category: cCat, amount: duesCalcState.nominal, description: `${cCat} ${pBln} (${m.name})` };
+      saveMemberToFirebase({ ...m, lastPaid: newLastPaid }); saveTransactionToFirebase(newTx);
     }
-  });
-  
-  showToast('Pembayaran masal berhasil!', 'success');
+  }); showToast('Pembayaran masal sukses!', 'success');
 }
 
-function quickPay(mId) {
-  openModal('transaction');
-  document.getElementById('modal-tx-title').innerText = 'Catat Transaksi';
-  setTxType('Pemasukan');
-  let cCat = appState.categories.find(c => c.type === 'Pemasukan' && isIuran(c.name))?.name || 'Iuran Bulanan';
-  document.getElementById('tx-category').value = cCat;
-  onTxCategoryChange();
-  document.getElementById('tx-member-select').value = mId;
-  onTxMemberSelectChange();
-}
+function quickPay(mId) { openModal('transaction'); document.getElementById('modal-tx-title').innerText = 'Catat Transaksi'; setTxType('Pemasukan'); let cCat = appState.categories.find(c => c.type === 'Pemasukan' && isIuran(c.name))?.name || 'Iuran Bulanan'; document.getElementById('tx-category').value = cCat; onTxCategoryChange(); document.getElementById('tx-member-select').value = mId; onTxMemberSelectChange(); }
 
 function showMemberDetail(memberId) {
-  const m = appState.members.find(x => x.id === memberId);
-  if (!m) return;
-  const st = getMemberDuesStatus(m);
-  
-  let lpStr = '-';
-  if (m.lastPaid && m.lastPaid.includes('-')) {
-    const p = m.lastPaid.split('-');
-    const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-    lpStr = `${mn[parseInt(p[1], 10)-1]} ${p[0]}`;
-  }
+  const m = appState.members.find(x => x.id === memberId); if (!m) return;
+  const st = getMemberDuesStatus(m); let lpStr = '-';
+  if (m.lastPaid && m.lastPaid.includes('-')) { const p = m.lastPaid.split('-'); const mn = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']; lpStr = `${mn[parseInt(p[1], 10)-1]} ${p[0]}`; }
   
   const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin';
-  
   document.getElementById('modal-generic-title').innerText = 'Detail Anggota';
   document.getElementById('modal-generic-content').innerHTML = `
-    <div class="flex flex-col items-center mb-4 mt-1 relative">
-      ${isAdmin ? `<button id="btn-edit-member-detail" class="absolute top-0 right-0 w-8 h-8 rounded-full bg-white/10 active-spring flex items-center justify-center text-ios-blue text-xs"><i class="fa-solid fa-pen"></i></button>` : ''}
-      <div class="w-16 h-16 rounded-full bg-gradient-to-br from-ios-blue to-indigo-500 text-white flex items-center justify-center font-bold text-2xl mb-2 shrink-0 shadow">
-        ${m.name.charAt(0).toUpperCase()}
-      </div>
-      <h4 class="text-[18px] font-bold text-white text-center leading-tight tracking-tight">${m.name}</h4>
-      <p class="text-[11px] font-medium text-white/50 mt-0.5 uppercase tracking-widest">${m.phone || '-'}</p>
+    <div class="flex flex-col items-center mb-3 mt-1 relative w-full">
+      ${isAdmin ? `<button id="btn-edit-member-detail" class="absolute top-0 right-0 w-7 h-7 rounded-full bg-white/10 active-spring flex items-center justify-center text-ios-blue text-[11px]"><i class="fa-solid fa-pen"></i></button>` : ''}
+      <div class="w-14 h-14 rounded-full bg-gradient-to-br from-ios-blue to-indigo-500 text-white flex items-center justify-center font-bold text-xl mb-1.5 shrink-0 shadow">${(m.name || 'U').charAt(0).toUpperCase()}</div>
+      <h4 class="text-[16px] font-bold text-white text-center leading-tight tracking-tight">${m.name}</h4><p class="text-[11px] font-medium text-white/50 mt-0.5 uppercase tracking-widest">${m.phone || '-'}</p>
     </div>
-    
-    <div class="ios-list p-3 mb-3 space-y-2 bg-[#2C2C2E]">
-       <div class="flex justify-between items-center text-[12px]">
-         <span class="text-white/50 font-medium uppercase tracking-widest">Alamat</span>
-         <span class="font-semibold text-white text-right truncate max-w-[60%]">${m.address || '-'}</span>
-       </div>
+    <div class="ios-list p-2.5 mb-2.5 space-y-1.5 bg-[#2C2C2E] w-full">
+       <div class="flex justify-between items-center text-[11px]"><span class="text-white/50 font-medium uppercase tracking-widest">Alamat</span><span class="font-semibold text-white text-right truncate max-w-[60%]">${m.address || '-'}</span></div>
        <div class="w-full h-px bg-white/10"></div>
-       <div class="flex justify-between items-center text-[12px]">
-         <span class="text-white/50 font-medium uppercase tracking-widest">Bergabung</span>
-         <span class="font-semibold text-white">${formatDateIndo(m.joinDate)}</span>
-       </div>
+       <div class="flex justify-between items-center text-[11px]"><span class="text-white/50 font-medium uppercase tracking-widest">Bergabung</span><span class="font-semibold text-white">${formatDateIndo(m.joinDate)}</span></div>
        <div class="w-full h-px bg-white/10"></div>
-       <div class="flex justify-between items-center text-[12px]">
-         <span class="text-white/50 font-medium uppercase tracking-widest">Terakhir Bayar</span>
-         <span class="font-semibold text-white">${lpStr}</span>
-       </div>
+       <div class="flex justify-between items-center text-[11px]"><span class="text-white/50 font-medium uppercase tracking-widest">Terakhir Bayar</span><span class="font-semibold text-white">${lpStr}</span></div>
     </div>
-    
-    <div class="bg-[#2C2C2E] rounded-[18px] p-3 text-xs">
+    <div class="bg-[#2C2C2E] rounded-[14px] p-2.5 text-xs w-full">
        <div class="flex justify-between items-center mb-1.5">
-         <span class="text-white/60 font-semibold uppercase tracking-widest">Status Iuran</span>
-         ${st.isPaid ? `<span class="px-2 py-0.5 rounded-[6px] bg-ios-green/20 text-ios-green text-[9px] font-bold uppercase tracking-wider">Lunas</span>` : `<span class="px-2 py-0.5 rounded-[6px] bg-ios-red/20 text-ios-red text-[9px] font-bold uppercase tracking-wider">Belum Bayar ${st.arrears} Bln</span>`}
+         <span class="text-white/60 font-semibold uppercase tracking-widest text-[10px]">Status Iuran</span>
+         ${st.isPaid ? `<span class="px-2 py-0.5 rounded-[5px] bg-ios-green/20 text-ios-green text-[9.5px] font-bold uppercase tracking-wider">Lunas</span>` : `<span class="px-2 py-0.5 rounded-[5px] bg-ios-red/20 text-ios-red text-[9.5px] font-bold uppercase tracking-wider">Belum bayar ${st.arrears} Bln</span>`}
        </div>
-       ${!st.isPaid ? `
-       <p class="text-white/80 font-medium leading-relaxed bg-black/40 p-2.5 rounded-[12px] text-[11px]">
-         Belum bayar untuk bulan: <br><span class="font-bold text-ios-orange leading-loose">${st.unpaidMonths.join(', ')}</span>
-       </p>` : ''}
+       ${!st.isPaid ? `<p class="text-white/80 font-medium leading-relaxed bg-black/40 p-2 rounded-[10px] text-[10.5px]">Belum bayar untuk:<br><span class="font-bold text-ios-orange leading-loose">${st.unpaidMonths.join(', ')}</span></p>` : ''}
     </div>
   `;
-
-  if (isAdmin) {
-    const editBtn = document.getElementById('btn-edit-member-detail');
-    if (editBtn) editBtn.addEventListener('click', () => editMember(m.id));
-  }
-  
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-  document.getElementById('modal-generic').classList.add('open');
-  document.getElementById('app-wrapper').classList.add('modal-active');
-  requestAnimationFrame(() => document.getElementById('modal-backdrop').classList.add('opacity-100'));
+  if (isAdmin) { const editBtn = document.getElementById('btn-edit-member-detail'); if (editBtn) editBtn.addEventListener('click', () => { closeAllModals(); setTimeout(()=>editMember(m.id), 300); }); }
+  document.getElementById('modal-backdrop').classList.remove('hidden'); document.getElementById('modal-generic').classList.add('open'); document.getElementById('app-wrapper').classList.add('modal-active'); requestAnimationFrame(() => document.getElementById('modal-backdrop').classList.add('opacity-100'));
 }
 
-async function renderTransactions() {
-  const key = String(document.getElementById('search-transactions').value).toLowerCase();
-  let monthFilter = document.getElementById('filter-tx-month').value; 
-  
-  if (!monthFilter) {
-    const now = new Date();
-    monthFilter = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}`;
-    document.getElementById('filter-tx-month').value = monthFilter; 
-  }
+function openTxContext(id) {
+  const t = appState.transactions.find(x => x.id === id); if(!t) return; const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin';
+  document.getElementById('ctx-tx-title').innerText = t.category; document.getElementById('ctx-tx-amount').innerText = formatRp(t.amount);
+  const btnEdit = document.getElementById('ctx-btn-edit'); const btnDelete = document.getElementById('ctx-btn-delete');
+  if(!isAdmin) { btnEdit.classList.add('hidden'); btnDelete.classList.add('hidden'); return; }
+  btnEdit.classList.remove('hidden'); btnDelete.classList.remove('hidden');
+  btnEdit.onclick = () => { closeAllModals(); setTimeout(()=>editTx(id), 300); };
+  btnDelete.onclick = () => { closeAllModals(); setTimeout(()=>deleteTx(id), 300); };
+  if (isYearLocked(t.date)) { btnEdit.classList.add('hidden'); btnDelete.classList.add('hidden'); }
+  document.getElementById('modal-backdrop').classList.remove('hidden'); document.getElementById('modal-tx-context').classList.add('open'); document.getElementById('app-wrapper').classList.add('modal-active'); requestAnimationFrame(() => document.getElementById('modal-backdrop').classList.add('opacity-100'));
+}
 
-  const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin';
-  const list = document.getElementById('list-transactions-view');
-  const loadMoreContainer = document.getElementById('load-more-tx-container');
+function openMemberContext(id) {
+  const m = appState.members.find(x => x.id === id); if(!m) return; const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin';
+  document.getElementById('ctx-member-title').innerText = m.name; document.getElementById('ctx-member-phone').innerText = m.phone || '-';
+  const btnEdit = document.getElementById('ctx-member-btn-edit'); const btnDelete = document.getElementById('ctx-member-btn-delete'); const btnDetail = document.getElementById('ctx-member-btn-detail');
+  
+  btnDetail.onclick = () => { closeAllModals(); setTimeout(()=>showMemberDetail(id), 300); };
+  if(!isAdmin) { btnEdit.classList.add('hidden'); btnDelete.classList.add('hidden'); } else { btnEdit.classList.remove('hidden'); btnDelete.classList.remove('hidden'); }
+  btnEdit.onclick = () => { closeAllModals(); setTimeout(()=>editMember(id), 300); };
+  btnDelete.onclick = () => { closeAllModals(); setTimeout(()=>deleteMember(id), 300); };
 
-  if (db && authUser && getFirebaseConfig()) {
-    try {
-      const q = fb.query(
-        getCollectionRef('transactions'),
-        fb.where('date', '>=', `${monthFilter}-01`),
-        fb.where('date', '<=', `${monthFilter}-31`),
-        fb.orderBy('date', 'desc'),
-        fb.limitQuery(txCurrentPage * txPageSize)
-      );
-      const snap = await fb.getDocs(q);
-      const fetchedTxs = [];
-      snap.forEach(d => fetchedTxs.push({ id: d.id, ...d.data() }));
-      if (fetchedTxs.length > 0) {
-        fetchedTxs.forEach(ft => {
-          const idx = appState.transactions.findIndex(x => x.id === ft.id);
-          if (idx > -1) appState.transactions[idx] = ft;
-          else appState.transactions.push(ft);
-        });
-      }
-    } catch(e) {}
-  }
-  
-  let f = appState.transactions;
-  if (monthFilter) f = f.filter(t => String(t.date).startsWith(monthFilter));
-  
-  f = f.filter(t => 
-    String(t.description||'').toLowerCase().includes(key) || String(t.category||'').toLowerCase().includes(key)
-  ).sort((a,b) => new Date(b.date) - new Date(a.date));
+  document.getElementById('modal-backdrop').classList.remove('hidden'); document.getElementById('modal-member-context').classList.add('open'); document.getElementById('app-wrapper').classList.add('modal-active'); requestAnimationFrame(() => document.getElementById('modal-backdrop').classList.add('opacity-100'));
+}
+
+function renderTransactions() {
+  const key = String(document.getElementById('search-transactions').value).toLowerCase(); let monthFilter = document.getElementById('filter-tx-month').value; 
+  if (!monthFilter) { const now = new Date(); monthFilter = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}`; document.getElementById('filter-tx-month').value = monthFilter; }
+  const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin'; const list = document.getElementById('list-transactions-view'); const loadMoreContainer = document.getElementById('load-more-tx-container');
+
+  let f = appState.transactions || []; if (monthFilter) f = f.filter(t => String(t.date).startsWith(monthFilter));
+  f = f.filter(t => String(t.description||'').toLowerCase().includes(key) || String(t.category||'').toLowerCase().includes(key)).sort((a,b) => new Date(b.date) - new Date(a.date));
 
   if(f.length === 0) {
      loadMoreContainer.classList.add('hidden');
-     return list.innerHTML = `<div class="p-6 text-center flex flex-col items-center"><div class="w-10 h-10 bg-white/5 text-white/30 flex items-center justify-center rounded-full mb-2"><i class="fa-solid fa-magnifying-glass text-lg"></i></div><span class="text-[11px] text-white/40 font-medium uppercase tracking-widest">Tidak ada transaksi</span></div>`;
+     return list.innerHTML = `<div class="p-4 text-center flex flex-col items-center"><div class="w-8 h-8 bg-white/5 text-white/30 flex items-center justify-center rounded-full mb-1.5"><i class="fa-solid fa-magnifying-glass text-sm"></i></div><span class="text-[10px] text-white/40 font-medium uppercase tracking-widest">Tidak ada transaksi</span></div>`;
   }
   
-  let limit = txCurrentPage * txPageSize;
-  let toShow = f.slice(0, limit);
-
+  let limit = txCurrentPage * txPageSize; let toShow = f.slice(0, limit);
   list.innerHTML = toShow.map((t) => {
-    const isOut = t.type === 'Pengeluaran';
-    const icon = getCategoryIcon(t.category);
-    const locked = isYearLocked(t.date);
-
+    const isOut = t.type === 'Pengeluaran'; const icon = getCategoryIcon(t.category); const locked = isYearLocked(t.date);
     return `
-      <div class="ios-list-item !py-2 !items-center">
-        ${isAdmin ? `<div class="flex items-center mr-2"><input type="checkbox" class="tx-cb w-3.5 h-3.5 rounded border-white/20 accent-ios-blue shrink-0 cursor-pointer" value="${t.id}" ${locked ? 'disabled' : ''}></div>` : ''}
-        
-        <div class="w-8 h-8 rounded-full ${isOut ? 'bg-ios-red/15 text-ios-red' : 'bg-ios-green/15 text-ios-green'} flex items-center justify-center mr-2 shrink-0 text-xs relative">
-          ${icon}
-          ${locked ? `<span class="absolute -top-1 -right-1 text-[8px] text-ios-orange"><i class="fa-solid fa-lock"></i></span>` : ''}
-        </div>
-
-        <div class="ios-list-content !items-start !pb-0 !mb-0 border-none w-full min-w-0">
-          <div class="flex-1 min-w-0 pr-1">
-            <div class="flex items-baseline justify-between mb-0.5 w-full gap-1">
-               <h4 class="text-[13px] font-semibold text-white truncate">${t.category}</h4>
-               <span class="text-[8px] text-white/40 font-bold tracking-widest uppercase shrink-0">${formatDateIndo(t.date)}</span>
-            </div>
-            <p class="text-[11px] text-white/50 font-medium truncate">${t.description||'-'}</p>
+      <div class="ios-list-item !py-2 px-2 tx-item-row relative overflow-hidden" data-tx-id="${t.id}">
+        ${isAdmin ? `<div class="flex items-center mr-2 z-10 tx-cb-col ${isTxSelectionMode ? '' : 'hidden'}"><input type="checkbox" class="tx-cb w-4 h-4 rounded border-white/25 accent-ios-blue shrink-0 cursor-pointer" value="${t.id}" ${locked ? 'disabled' : ''}></div>` : ''}
+        <div class="w-8 h-8 rounded-full ${isOut ? 'bg-ios-red/15 text-ios-red' : 'bg-ios-green/15 text-ios-green'} flex items-center justify-center mr-2 shrink-0 text-[11px] relative pointer-events-none z-0">${icon} ${locked ? `<span class="absolute -top-1 -right-1 text-[7px] text-ios-orange"><i class="fa-solid fa-lock"></i></span>` : ''}</div>
+        <div class="ios-list-content !items-start !pb-0 !mb-0 border-none w-full min-w-0 pointer-events-none z-0">
+          <div class="flex-1 min-w-0 pr-1 select-none">
+            <div class="flex items-baseline justify-between mb-0.5 w-full gap-1"><h4 class="text-[13px] font-semibold text-white truncate leading-tight">${t.category}</h4><span class="text-[8.5px] text-white/40 font-bold tracking-widest uppercase shrink-0">${formatDateIndo(t.date)}</span></div>
+            <p class="text-[10.5px] text-white/50 font-medium truncate leading-tight">${t.description||'-'}</p>
           </div>
-          
-          <div class="flex flex-col items-end justify-center shrink-0 pl-1.5 border-l border-white/5 ml-1.5">
-            <span class="text-[13px] font-bold tracking-tight ${isOut ? 'text-white' : 'text-ios-green'} whitespace-nowrap">${isOut ? '-' : '+'}${formatRp(t.amount)}</span>
-            <div class="flex gap-1 mt-0.5">
-              ${isAdmin && !locked ? `<button class="btn-edit-tx text-ios-blue text-[9px] w-5 h-5 flex items-center justify-center active-spring bg-white/10 rounded-full shrink-0" data-tx-id="${t.id}"><i class="fa-solid fa-pen"></i></button>` : ''}
-              ${isAdmin && !locked ? `<button class="btn-delete-tx text-ios-red text-[9px] w-5 h-5 flex items-center justify-center active-spring bg-ios-red/10 rounded-full shrink-0" data-tx-id="${t.id}"><i class="fa-solid fa-trash-can"></i></button>` : ''}
-            </div>
-          </div>
+          <div class="flex items-center justify-end shrink-0 pl-1.5 border-l border-white/10 ml-1.5 select-none"><span class="text-[13px] font-bold tracking-tight ${isOut ? 'text-white' : 'text-ios-green'} whitespace-nowrap">${isOut ? '-' : '+'}${formatRp(t.amount)}</span></div>
         </div>
       </div>
     `;
   }).join('');
 
-  document.querySelectorAll('.tx-cb').forEach(cb => cb.addEventListener('change', updateBulkDeleteBtn));
-  document.querySelectorAll('.btn-edit-tx').forEach(btn => btn.addEventListener('click', () => editTx(btn.getAttribute('data-tx-id'))));
-  document.querySelectorAll('.btn-delete-tx').forEach(btn => btn.addEventListener('click', () => deleteTx(btn.getAttribute('data-tx-id'))));
+  document.querySelectorAll('.tx-item-row').forEach(row => {
+      let pressTimer; let startY = 0; let startX = 0; let isDragging = false; const id = row.getAttribute('data-tx-id');
+      const start = (e) => { 
+        if(e.target.closest('.tx-cb')) return; 
+        isDragging = false; 
+        if(e.touches) { startX = e.touches[0].clientX; startY = e.touches[0].clientY; } 
+        row.classList.add('bg-white/5'); 
+        pressTimer = setTimeout(() => { 
+          if(!isDragging) { 
+            if(navigator.vibrate) navigator.vibrate(50); 
+            isTxSelectionMode = true;
+            document.querySelectorAll('.tx-cb-col').forEach(el => el.classList.remove('hidden'));
+            const cb = row.querySelector('.tx-cb');
+            if(cb && !cb.disabled) { cb.checked = true; updateBulkDeleteBtn(); }
+          } 
+        }, 500); 
+      };
+      const move = (e) => { 
+        if(e.touches) { 
+          const moveX = e.touches[0].clientX; const moveY = e.touches[0].clientY; 
+          if(Math.abs(moveX - startX) > 8 || Math.abs(moveY - startY) > 8) isDragging = true; 
+        } else { isDragging = true; } 
+        if(isDragging) { clearTimeout(pressTimer); row.classList.remove('bg-white/5'); } 
+      };
+      const cancel = () => { clearTimeout(pressTimer); row.classList.remove('bg-white/5'); };
+      
+      row.addEventListener('touchstart', start, {passive: true}); row.addEventListener('touchmove', move, {passive: true}); row.addEventListener('touchend', cancel); row.addEventListener('touchcancel', cancel);
+      row.addEventListener('mousedown', start); row.addEventListener('mousemove', move); row.addEventListener('mouseup', cancel); row.addEventListener('mouseleave', cancel);
+      
+      row.addEventListener('click', (e) => {
+        if(e.target.closest('.tx-cb')) return;
+        if(isDragging) return;
+        openTxContext(id);
+      });
+  });
   
-  if (f.length > limit) {
-     loadMoreContainer.classList.remove('hidden');
-     document.getElementById('load-more-count').innerText = `(${f.length - limit} lagi)`;
-  } else {
-     loadMoreContainer.classList.add('hidden');
-  }
+  document.querySelectorAll('.tx-cb').forEach(cb => cb.addEventListener('change', updateBulkDeleteBtn));
 
+  if (f.length > limit) { 
+    loadMoreContainer.classList.remove('hidden'); 
+    document.getElementById('load-more-count').innerText = `+${f.length - limit} lagi`; 
+  } else { 
+    loadMoreContainer.classList.add('hidden'); 
+  } 
+  
   updateBulkDeleteBtn();
 }
 
-function debouncedRenderTransactions() {
-  txCurrentPage = 1;
-  renderTransactions();
-}
-
-function loadMoreTransactions() {
-  txCurrentPage++;
-  renderTransactions();
-}
+function debouncedRenderTransactions() { txCurrentPage = 1; renderTransactions(); }
+function loadMoreTransactions() { txCurrentPage++; renderTransactions(); }
 
 function editTx(id) {
-  const t = appState.transactions.find(x => x.id === id);
-  if(!t) return;
-  if(isYearLocked(t.date)) return showToast('Transaksi pada tahun terkunci tidak dapat diedit!', 'error');
-
-  openModal('transaction');
-  document.getElementById('modal-tx-title').innerText = 'Edit Transaksi';
-  document.getElementById('tx-id').value = t.id;
-  document.getElementById('tx-date').value = t.date;
-  setTxType(t.type);
-  document.getElementById('tx-category').value = t.category;
-  onTxCategoryChange(); 
-  document.getElementById('tx-amount').value = t.amount;
-  document.getElementById('tx-description').value = t.description;
-  
-  if(t.type === 'Pemasukan' && isIuran(t.category)) {
-      showMemberContainer(false); 
-      document.getElementById('tx-description').placeholder = "Edit keterangan manual...";
-  }
+  const t = appState.transactions.find(x => x.id === id); if(!t) return;
+  if(isYearLocked(t.date)) return showToast('Tahun transaksi terkunci!', 'error');
+  openModal('transaction'); document.getElementById('modal-tx-title').innerText = 'Edit Transaksi';
+  document.getElementById('tx-id').value = t.id; document.getElementById('tx-date').value = t.date;
+  setTxType(t.type); document.getElementById('tx-category').value = t.category; onTxCategoryChange(); 
+  document.getElementById('tx-amount').value = t.amount; document.getElementById('tx-description').value = t.description;
+  if(t.type === 'Pemasukan' && isIuran(t.category)) { showMemberContainer(false); document.getElementById('tx-description').placeholder = "Edit keterangan manual..."; }
 }
 
-function showMemberContainer(show) {
-  const wrapper = document.getElementById('tx-member-wrapper');
-  if(!wrapper) return;
-  if(show) {
-    wrapper.classList.remove('grid-rows-[0fr]', 'opacity-0', 'pointer-events-none');
-    wrapper.classList.add('grid-rows-[1fr]', 'opacity-100', 'pointer-events-auto');
-  } else {
-    wrapper.classList.remove('grid-rows-[1fr]', 'opacity-100', 'pointer-events-auto');
-    wrapper.classList.add('grid-rows-[0fr]', 'opacity-0', 'pointer-events-none');
-  }
-}
-
-function isMemberContainerVisible() {
-  const wrapper = document.getElementById('tx-member-wrapper');
-  return wrapper && wrapper.classList.contains('grid-rows-[1fr]');
-}
+function showMemberContainer(show) { const wrapper = document.getElementById('tx-member-wrapper'); if(!wrapper) return; if(show) { wrapper.classList.remove('grid-rows-[0fr]', 'opacity-0', 'pointer-events-none'); wrapper.classList.add('grid-rows-[1fr]', 'opacity-100', 'pointer-events-auto'); } else { wrapper.classList.remove('grid-rows-[1fr]', 'opacity-100', 'pointer-events-auto'); wrapper.classList.add('grid-rows-[0fr]', 'opacity-0', 'pointer-events-none'); } }
+function isMemberContainerVisible() { const wrapper = document.getElementById('tx-member-wrapper'); return wrapper && wrapper.classList.contains('grid-rows-[1fr]'); }
 
 function deleteTx(id) {
-  const t = appState.transactions.find(x => x.id === id);
-  if(!t) return;
-  if(isYearLocked(t.date)) return showToast('Transaksi pada tahun terkunci tidak dapat dihapus!', 'error');
-
-  showConfirm('Hapus transaksi ini secara permanen? Jika ini adalah pembayaran iuran, status lunas anggota akan ditarik kembali.', () => {
+  const t = appState.transactions.find(x => x.id === id); if(!t) return;
+  if(isYearLocked(t.date)) return showToast('Tahun terkunci!', 'error');
+  showConfirm('Hapus transaksi secara permanen? Jika ini iuran, status lunas akan mundur.', () => {
     if (t.type === 'Pemasukan' && isIuran(t.category)) {
       const match = (t.description || '').match(/\(([^)]+)\)$/);
-      if (match) {
-        const memberName = match[1].trim();
-        const member = appState.members.find(m => String(m.name).trim() === memberName);
-        if (member && member.lastPaid) {
-          const nominal = duesCalcState.nominal || 15000;
-          const monthsToRollback = Math.max(1, Math.round(Number(t.amount) / nominal));
-          const p = member.lastPaid.split('-');
-          let y = parseInt(p[0], 10), m = parseInt(p[1], 10);
-          m -= monthsToRollback;
-          while (m <= 0) { m += 12; y -= 1; }
-          saveMemberToFirebase({ ...member, lastPaid: `${y}-${String(m).padStart(2, '0')}` });
-        }
-      }
+      if (match) { const memberName = match[1].trim(); const member = appState.members.find(m => String(m.name).trim() === memberName); if (member && member.lastPaid) { const nominal = duesCalcState.nominal || 15000; const monthsToRollback = Math.max(1, Math.round(Number(t.amount) / nominal)); const p = member.lastPaid.split('-'); let y = parseInt(p[0], 10), m = parseInt(p[1], 10); m -= monthsToRollback; while (m <= 0) { m += 12; y -= 1; } saveMemberToFirebase({ ...member, lastPaid: `${y}-${String(m).padStart(2, '0')}` }); } }
     }
-
-    deleteTransactionFromFirebase(id);
-    showToast('Transaksi Dihapus', 'success');
+    deleteTransactionFromFirebase(id); showToast('Transaksi Dihapus', 'success');
   });
 }
 
-function toggleSelectAllTransactions(cb) {
-  document.querySelectorAll('.tx-cb:not([disabled])').forEach(c => c.checked = cb.checked);
-  updateBulkDeleteBtn();
-}
-
-function updateBulkDeleteBtn() {
-  const c = document.querySelectorAll('.tx-cb:checked').length;
-  const btnContainer = document.getElementById('bulk-delete-btn-container');
-  const btn = document.getElementById('bulk-delete-btn');
-  if(c > 0) {
-    btnContainer.classList.remove('hidden');
-    btn.innerText = `Hapus ${c} Terpilih`;
-  } else {
+function updateBulkDeleteBtn() { 
+  const c = document.querySelectorAll('.tx-cb:checked').length; 
+  const btnContainer = document.getElementById('bulk-delete-btn-container'); 
+  if(c > 0) { 
+    btnContainer.classList.remove('hidden'); 
+    document.getElementById('bulk-delete-btn').innerHTML = `<i class="fa-solid fa-trash"></i> Hapus ${c} Terpilih`; 
+  } else { 
     btnContainer.classList.add('hidden');
-  }
+    isTxSelectionMode = false;
+    document.querySelectorAll('.tx-cb-col').forEach(el => el.classList.add('hidden'));
+  } 
 }
 
 function deleteSelectedTransactions() {
-  const ids = Array.from(document.querySelectorAll('.tx-cb:checked')).map(c => c.value);
-  if(ids.length===0) return;
-  
-  showConfirm(`Hapus ${ids.length} transaksi terpilih secara permanen?`, () => {
+  const ids = Array.from(document.querySelectorAll('.tx-cb:checked')).map(c => c.value); if(ids.length===0) return;
+  showConfirm(`Hapus ${ids.length} transaksi secara permanen?`, () => {
     ids.forEach(id => {
       const t = appState.transactions.find(x => x.id === id);
       if (t && !isYearLocked(t.date)) {
         if (t.type === 'Pemasukan' && isIuran(t.category)) {
           const match = (t.description || '').match(/\(([^)]+)\)$/);
-          if (match) {
-            const memberName = match[1].trim();
-            const member = appState.members.find(m => String(m.name).trim() === memberName);
-            if (member && member.lastPaid) {
-              const nominal = duesCalcState.nominal || 15000;
-              const monthsToRollback = Math.max(1, Math.round(Number(t.amount) / nominal));
-              const p = member.lastPaid.split('-');
-              let y = parseInt(p[0], 10), m = parseInt(p[1], 10);
-              m -= monthsToRollback;
-              while (m <= 0) { m += 12; y -= 1; }
-              saveMemberToFirebase({ ...member, lastPaid: `${y}-${String(m).padStart(2, '0')}` });
-            }
-          }
+          if (match) { const member = appState.members.find(m => String(m.name).trim() === match[1].trim()); if (member && member.lastPaid) { const nominal = duesCalcState.nominal || 15000; const rollback = Math.max(1, Math.round(Number(t.amount) / nominal)); const p = member.lastPaid.split('-'); let y = parseInt(p[0], 10), m = parseInt(p[1], 10); m -= rollback; while (m <= 0) { m += 12; y -= 1; } saveMemberToFirebase({ ...member, lastPaid: `${y}-${String(m).padStart(2, '0')}` }); } }
         }
         deleteTransactionFromFirebase(id);
       }
-    });
-
+    }); 
+    isTxSelectionMode = false; updateBulkDeleteBtn();
     showToast(`${ids.length} Transaksi Dihapus`, 'success');
   });
 }
 
-function debouncedRenderMembers() {
-  clearTimeout(memSearchTimer);
-  memSearchTimer = setTimeout(renderMembers, 150);
-}
+function debouncedRenderMembers() { clearTimeout(memSearchTimer); memSearchTimer = setTimeout(renderMembers, 150); }
 
 function renderMembers() {
-  const key = String(document.getElementById('search-members').value).toLowerCase();
-  const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin';
-  const grid = document.getElementById('grid-members-view');
+  let tMembers = 0, lunas = 0, blm = 0, telat = 0;
+  let memberWithStatus = [];
   
-  const f = appState.members.filter(m => String(m.name||'').toLowerCase().includes(key) || String(m.address||'').toLowerCase().includes(key));
-  if(f.length===0) return grid.innerHTML = `<div class="col-span-1 text-center p-6 flex flex-col items-center"><div class="w-10 h-10 bg-white/5 text-white/30 flex items-center justify-center rounded-full mb-2"><i class="fa-solid fa-user-xmark text-lg"></i></div><span class="text-[11px] text-white/40 font-medium uppercase tracking-widest">Tidak ada anggota</span></div>`;
-  
-  f.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
-
-  let currentLetter = '';
-  let htmlOutput = '';
-
-  f.forEach((m) => {
-    const nameInitial = String(m.name || ' ').charAt(0).toUpperCase();
-    if (nameInitial !== currentLetter) {
-      currentLetter = nameInitial;
-      htmlOutput += `<div class="col-span-1 mt-2 mb-0.5"><span class="text-[15px] font-bold text-white/80 ml-1">${currentLetter}</span></div>`;
-    }
-
+  (appState.members || []).forEach(m => {
+    tMembers++;
     const st = getMemberDuesStatus(m);
+    if (st.isPaid) {
+      lunas++;
+    } else {
+      blm++;
+      if (st.arrears > 1) telat++;
+    }
+    memberWithStatus.push({ member: m, status: st });
+  });
+
+  const elTotal = document.getElementById('sum-total-members');
+  if (elTotal) {
+    elTotal.innerText = tMembers;
+    document.getElementById('sum-paid-members').innerText = lunas;
+    document.getElementById('sum-unpaid-members').innerText = blm;
+    document.getElementById('sum-overdue-members').innerText = telat;
+  }
+
+  const cLunas = document.getElementById('filter-card-lunas');
+  const cBelum = document.getElementById('filter-card-belum');
+  const cTelat = document.getElementById('filter-card-telat');
+  const btnAll = document.getElementById('btn-filter-all');
+
+  if(cLunas && cBelum && cTelat && btnAll) {
+      cLunas.className = "filter-card cursor-pointer py-1 px-1 rounded-[10px] flex flex-col items-center justify-center text-center border active-spring transition-all duration-300 " + (currentMemberFilter === 'lunas' ? "bg-ios-green/20 border-ios-green/50 shadow-[0_0_15px_rgba(50,215,75,0.15)] scale-[1.02]" : "bg-white/5 border-white/5 hover:bg-white/10");
+      cBelum.className = "filter-card cursor-pointer py-1 px-1 rounded-[10px] flex flex-col items-center justify-center text-center border active-spring transition-all duration-300 " + (currentMemberFilter === 'belum' ? "bg-ios-orange/20 border-ios-orange/50 shadow-[0_0_15px_rgba(255,159,10,0.15)] scale-[1.02]" : "bg-white/5 border-white/5 hover:bg-white/10");
+      cTelat.className = "filter-card cursor-pointer py-1 px-1 rounded-[10px] flex flex-col items-center justify-center text-center border active-spring transition-all duration-300 " + (currentMemberFilter === 'telat' ? "bg-ios-red/20 border-ios-red/50 shadow-[0_0_15px_rgba(255,69,58,0.15)] scale-[1.02]" : "bg-white/5 border-white/5 hover:bg-white/10");
+      btnAll.className = "text-[8.5px] font-bold text-white px-2 py-0.5 rounded-full border active-spring transition-all duration-300 shadow-sm " + (currentMemberFilter === 'all' ? "bg-white/20 border-white/30" : "bg-transparent border-white/10 text-white/60");
+  }
+
+  const key = String(document.getElementById('search-members').value).toLowerCase(); const isAdmin = appState.currentUser && appState.currentUser.role === 'Admin'; const grid = document.getElementById('grid-members-view');
+  
+  let filtered = memberWithStatus.filter(x => String(x.member.name||'').toLowerCase().includes(key) || String(x.member.address||'').toLowerCase().includes(key));
+
+  if (currentMemberFilter === 'lunas') filtered = filtered.filter(x => x.status.isPaid);
+  else if (currentMemberFilter === 'belum') filtered = filtered.filter(x => !x.status.isPaid);
+  else if (currentMemberFilter === 'telat') filtered = filtered.filter(x => x.status.arrears > 1);
+
+  filtered.sort((a, b) => String(a.member.name || '').localeCompare(String(b.member.name || '')));
+
+  if(filtered.length===0) return grid.innerHTML = `<div class="col-span-1 text-center p-6 bg-black/20 rounded-[16px] mt-2 border border-white/5"><div class="w-10 h-10 bg-white/5 text-white/30 mx-auto flex items-center justify-center rounded-full mb-2"><i class="fa-solid fa-user-xmark text-lg"></i></div><span class="text-[11px] text-white/40 font-medium uppercase tracking-widest">Tidak ada data</span></div>`;
+
+  let currentLetter = ''; let htmlOutput = '';
+  filtered.forEach((item) => {
+    const m = item.member;
+    const st = item.status;
+    const nameInitial = String(m.name || ' ').charAt(0).toUpperCase(); if (nameInitial !== currentLetter) { currentLetter = nameInitial; htmlOutput += `<div class="col-span-1 mt-1.5"><span class="text-[13px] font-bold text-white/80 ml-1">${currentLetter}</span></div>`; }
     htmlOutput += `
-      <div class="ios-cc-module !rounded-[18px] p-3 relative flex flex-col justify-between active-spring cursor-pointer card-member-item" data-member-id="${m.id}">
-        <div class="flex justify-between items-start mb-2">
-          <div class="flex items-center gap-2 flex-1 min-w-0">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-ios-blue to-indigo-500 flex items-center justify-center font-bold text-sm text-white shrink-0">
-              ${m.name.charAt(0).toUpperCase()}
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="font-semibold text-[14px] leading-tight text-white mb-0.5 break-words">${m.name}</h4>
-              <p class="text-[10px] font-medium text-white/40 uppercase tracking-widest truncate">${m.phone||'-'}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-1 z-10">
-            ${isAdmin ? `<button class="btn-edit-member text-ios-blue text-[10px] w-6 h-6 flex justify-center items-center bg-white/10 rounded-full active-spring shrink-0" data-member-id="${m.id}"><i class="fa-solid fa-pen"></i></button>` : ''}
-          </div>
+      <div class="ios-cc-module !rounded-[14px] p-2.5 relative flex flex-col justify-between active-spring cursor-pointer card-member-item" data-member-id="${m.id}">
+        <div class="flex justify-between items-start mb-1.5">
+          <div class="flex items-center gap-2 flex-1 min-w-0"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-ios-blue to-indigo-500 flex items-center justify-center font-bold text-[13px] text-white shrink-0 shadow-sm">${(m.name || 'U').charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><h4 class="font-semibold text-[13px] leading-tight text-white mb-0.5 break-words">${m.name}</h4><p class="text-[9.5px] font-medium text-white/40 uppercase tracking-widest truncate">${m.phone||'-'}</p></div></div>
+          ${isAdmin ? `<button class="btn-edit-member text-ios-blue text-[10px] w-7 h-7 flex justify-center items-center bg-white/10 rounded-full active-spring shrink-0 z-10 hidden" data-member-id="${m.id}"><i class="fa-solid fa-pen"></i></button>` : ''}
         </div>
-        <div class="bg-black/30 rounded-[10px] p-2 flex justify-between items-center text-xs">
-          <span class="text-white/50 font-medium text-[9px] uppercase tracking-widest">Iuran</span>
-          ${st.isPaid ? `<span class="px-2 py-0.5 rounded-[5px] bg-ios-green/20 text-ios-green font-bold text-[8px] uppercase tracking-wider">Lunas</span>` : 
-            `<span class="px-2 py-0.5 rounded-[5px] bg-ios-red/20 text-ios-red font-bold text-[8px] uppercase tracking-wider">Belum Bayar ${st.arrears} Bln</span>`}
-        </div>
+        <div class="bg-black/30 rounded-[8px] p-1.5 flex justify-between items-center border border-white/5"><span class="text-white/50 font-medium text-[9.5px] uppercase tracking-widest">Iuran</span>${st.isPaid ? `<span class="px-1.5 py-0.5 rounded-[4px] bg-ios-green/20 border border-ios-green/30 text-ios-green font-bold text-[8.5px] uppercase tracking-wider">Lunas</span>` : `<span class="px-1.5 py-0.5 rounded-[4px] bg-ios-orange/20 border border-ios-orange/30 text-ios-orange font-bold text-[8.5px] uppercase tracking-wider">Belum bayar ${st.arrears} Bln</span>`}</div>
       </div>
     `;
   });
-  
   grid.innerHTML = htmlOutput;
 
   document.querySelectorAll('.card-member-item').forEach(card => {
+    let pressTimer; let startY = 0; let startX = 0; let isDragging = false; const id = card.getAttribute('data-member-id');
+    const start = (e) => { 
+      if(e.target.closest('.btn-edit-member')) return; 
+      isDragging = false; 
+      if(e.touches) { startX = e.touches[0].clientX; startY = e.touches[0].clientY; } 
+      card.classList.add('bg-white/5'); 
+      pressTimer = setTimeout(() => { 
+        if(!isDragging) { 
+          if(navigator.vibrate) navigator.vibrate(50); 
+          openMemberContext(id);
+        } 
+      }, 500); 
+    };
+    const move = (e) => { 
+      if(e.touches) { 
+        const moveX = e.touches[0].clientX; const moveY = e.touches[0].clientY; 
+        if(Math.abs(moveX - startX) > 8 || Math.abs(moveY - startY) > 8) isDragging = true; 
+      } else { isDragging = true; } 
+      if(isDragging) { clearTimeout(pressTimer); card.classList.remove('bg-white/5'); } 
+    };
+    const cancel = () => { clearTimeout(pressTimer); card.classList.remove('bg-white/5'); };
+    
+    card.addEventListener('touchstart', start, {passive: true}); card.addEventListener('touchmove', move, {passive: true}); card.addEventListener('touchend', cancel); card.addEventListener('touchcancel', cancel);
+    card.addEventListener('mousedown', start); card.addEventListener('mousemove', move); card.addEventListener('mouseup', cancel); card.addEventListener('mouseleave', cancel);
+    
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-edit-member')) return;
-      showMemberDetail(card.getAttribute('data-member-id'));
+      if(e.target.closest('.btn-edit-member')) return;
+      if(isDragging) return;
+      showMemberDetail(id);
     });
   });
 
-  document.querySelectorAll('.btn-edit-member').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      editMember(btn.getAttribute('data-member-id'));
-    });
+  document.querySelectorAll('.btn-edit-member').forEach(btn => { 
+    btn.addEventListener('click', (e) => { e.stopPropagation(); editMember(btn.getAttribute('data-member-id')); }); 
   });
 }
 
 function editMember(id) {
-  const m = appState.members.find(x => x.id === id);
-  if(!m) return;
-  
-  closeAllModals(); 
-  setTimeout(() => {
-    openModal('member');
-    document.getElementById('modal-member-title').innerText = 'Edit Anggota';
-    document.getElementById('member-id').value = m.id;
-    document.getElementById('member-name').value = m.name;
-    document.getElementById('member-phone').value = m.phone || '';
-    document.getElementById('member-address').value = m.address || '';
-    document.getElementById('member-joindate').value = m.joinDate;
-  }, 300);
+  const m = appState.members.find(x => x.id === id); if(!m) return; closeAllModals(); 
+  setTimeout(() => { openModal('member'); document.getElementById('modal-member-title').innerText = 'Edit Anggota'; document.getElementById('member-id').value = m.id; document.getElementById('member-name').value = m.name; document.getElementById('member-phone').value = m.phone || ''; document.getElementById('member-address').value = m.address || ''; document.getElementById('member-joindate').value = m.joinDate; }, 300);
+}
+
+function deleteMember(id) {
+  const m = appState.members.find(x => x.id === id); if(!m) return;
+  showConfirm(`Hapus anggota ${m.name}?`, () => {
+    deleteMemberFromFirebase(id);
+    showToast('Anggota Dihapus', 'success');
+  });
 }
 
 function initMonthsDropdown() {
-  const curY = new Date().getFullYear();
-  let mHtml = ``, yHtml = ``;
-  const mn = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-  mn.forEach((m, i) => mHtml += `<option value="${String(i+1).padStart(2,'0')}">${m}</option>`);
-  document.getElementById('report-month').innerHTML = mHtml;
-  
-  let yrs = new Set([curY]);
-  appState.transactions.forEach(t => { if(t.date) yrs.add(parseInt(t.date.split('-')[0], 10)); });
-  Array.from(yrs).sort((a,b)=>b-a).forEach(y => yHtml += `<option value="${y}">${y}</option>`);
-  document.getElementById('report-year').innerHTML = yHtml;
-  
-  const m = new Date().getMonth()+1;
-  document.getElementById('report-month').value = String(m).padStart(2,'0');
-  document.getElementById('report-year').value = curY;
+  const curY = new Date().getFullYear(); let mHtml = ``, yHtml = ``; const mn = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  mn.forEach((m, i) => mHtml += `<option value="${String(i+1).padStart(2,'0')}">${m}</option>`); document.getElementById('report-month').innerHTML = mHtml;
+  let yrs = new Set([curY]); (appState.transactions || []).forEach(t => { if(t.date) yrs.add(parseInt(t.date.split('-')[0], 10)); }); Array.from(yrs).sort((a,b)=>b-a).forEach(y => yHtml += `<option value="${y}">${y}</option>`); document.getElementById('report-year').innerHTML = yHtml;
+  document.getElementById('report-month').value = String(new Date().getMonth()+1).padStart(2,'0'); document.getElementById('report-year').value = curY;
 }
 
 function renderReports() {
-  const m = document.getElementById('report-month').value;
-  const y = document.getElementById('report-year').value;
-  let pBal = 0, pIn = 0, pOut = 0;
-  let cIn = {}, cOut = {};
-  let detailsIn = {}, detailsOut = {};
-
+  const m = document.getElementById('report-month').value; const y = document.getElementById('report-year').value; let pBal = 0, pIn = 0, pOut = 0; let cIn = {}, cOut = {}; let detailsIn = {}, detailsOut = {};
   const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const mIdx = parseInt(m, 10) - 1;
-  const currentMonthName = mn[mIdx];
+  const mIdx = parseInt(m, 10) - 1; let prevMonthIdx = mIdx - 1; let prevYearNum = parseInt(y, 10); if (prevMonthIdx < 0) { prevMonthIdx = 11; prevYearNum -= 1; }
   
-  let prevMonthIdx = mIdx - 1;
-  let prevYearNum = parseInt(y, 10);
-  if (prevMonthIdx < 0) { 
-    prevMonthIdx = 11; 
-    prevYearNum -= 1; 
-  }
-  const prevMonthName = mn[prevMonthIdx];
+  document.getElementById('label-report-prev-balance').innerText = `Saldo Akhir ${mn[prevMonthIdx]} ${prevYearNum}`; document.getElementById('label-report-in').innerText = `Pemasukan`; document.getElementById('label-report-out').innerText = `Pengeluaran`;
 
-  document.getElementById('label-report-prev-balance').innerText = `Saldo Akhir ${prevMonthName} ${prevYearNum}`;
-  document.getElementById('label-report-in').innerText = `Total Pemasukan ${currentMonthName} ${y}`;
-  document.getElementById('label-report-out').innerText = `Total Pengeluaran ${currentMonthName} ${y}`;
-
-  appState.transactions.forEach(t => {
-    if(!t.date) return;
-    const [ty, tm] = t.date.split('-');
-    const am = Number(t.amount)||0;
-    
-    if(ty === y && tm === m) {
-      if(t.type === 'Pemasukan') { 
-        pIn += am; 
-        cIn[t.category] = (cIn[t.category] || 0) + am;
-        if(!detailsIn[t.category]) detailsIn[t.category] = [];
-        detailsIn[t.category].push(t);
-      } else { 
-        pOut += am; 
-        cOut[t.category] = (cOut[t.category] || 0) + am; 
-        if(!detailsOut[t.category]) detailsOut[t.category] = [];
-        detailsOut[t.category].push(t);
-      }
-    } else if(t.date < `${y}-${m}-01`) {
-      if(t.type === 'Pemasukan') pBal += am; 
-      else pBal -= am;
-    }
+  (appState.transactions || []).forEach(t => {
+    if(!t.date) return; const [ty, tm] = t.date.split('-'); const am = Number(t.amount)||0;
+    if(ty === y && tm === m) { if(t.type === 'Pemasukan') { pIn += am; cIn[t.category] = (cIn[t.category] || 0) + am; if(!detailsIn[t.category]) detailsIn[t.category] = []; detailsIn[t.category].push(t); } else { pOut += am; cOut[t.category] = (cOut[t.category] || 0) + am; if(!detailsOut[t.category]) detailsOut[t.category] = []; detailsOut[t.category].push(t); } } 
+    else if(t.date < `${y}-${m}-01`) { if(t.type === 'Pemasukan') pBal += am; else pBal -= am; }
   });
 
-  document.getElementById('report-prev-balance').innerText = formatRp(pBal);
-  document.getElementById('report-in').innerText = formatRp(pIn);
-  document.getElementById('report-out').innerText = formatRp(pOut);
-  document.getElementById('report-net').innerText = formatRp(pBal + pIn - pOut);
+  document.getElementById('report-prev-balance').innerText = formatRp(pBal); document.getElementById('report-in').innerText = formatRp(pIn);
+  document.getElementById('report-out').innerText = formatRp(pOut); document.getElementById('report-net').innerText = formatRp(pBal + pIn - pOut);
 
-  const maxIn = Math.max(...Object.values(cIn), 1);
-  const rcIn = document.getElementById('container-report-cat-in');
-  const inEntries = Object.entries(cIn).sort((a,b) => b[1] - a[1]);
+  const maxIn = Math.max(...Object.values(cIn), 1); const rcIn = document.getElementById('container-report-cat-in'); const inEntries = Object.entries(cIn).sort((a,b) => b[1] - a[1]);
+  if(inEntries.length === 0) { rcIn.innerHTML = `<div class="text-[9.5px] text-white/30 font-semibold uppercase tracking-widest text-center py-1.5">Nihil</div>`; } 
+  else { rcIn.innerHTML = inEntries.map(([c, a]) => { const pct = Math.round((a / maxIn) * 100); const txList = (detailsIn[c] || []).sort((a,b) => new Date(b.date) - new Date(a.date)); const itemsHtml = txList.map(item => `<div class="flex justify-between items-start text-[10.5px] text-white/70 py-1 border-t border-white/5 gap-1.5"><div class="flex-1 min-w-0"><span class="text-[8.5px] font-bold text-ios-green bg-ios-green/15 px-1 py-[1px] rounded-[3px] mr-1">${formatDateIndo(item.date)}</span><span class="break-words">${item.description || '-'}</span></div><span class="font-semibold text-ios-green shrink-0 text-right whitespace-nowrap mt-0.5">${formatRp(item.amount)}</span></div>`).join(''); return `<div class="bg-black/30 p-2 rounded-[10px] border border-white/5"><div class="flex justify-between items-center text-[11px] mb-1"><span class="text-white font-bold truncate flex-1">${c}</span><span class="font-extrabold text-ios-green shrink-0 ml-2">${formatRp(a)}</span></div><div class="w-full bg-black/40 rounded-full h-1 mb-1.5"><div class="bg-ios-green h-1 rounded-full transition-all" style="width: ${pct}%;"></div></div><div class="space-y-0.5 mt-1.5"><div class="text-[8.5px] font-bold uppercase tracking-wider text-white/40 mb-1">Rincian (${txList.length}):</div>${itemsHtml}</div></div>`; }).join(''); }
 
-  if(inEntries.length === 0) {
-    rcIn.innerHTML = `<div class="text-[10px] text-white/30 font-semibold uppercase tracking-widest text-center py-3">Belum ada pemasukan</div>`;
-  } else {
-    rcIn.innerHTML = inEntries.map(([c, a]) => {
-      const pct = Math.round((a / maxIn) * 100);
-      const txList = (detailsIn[c] || []).sort((a,b) => new Date(b.date) - new Date(a.date));
-      
-      const itemsHtml = txList.map(item => `
-        <div class="flex justify-between items-start text-[11px] text-white/70 py-1.5 border-t border-white/5 gap-2">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[9px] font-bold text-ios-green bg-ios-green/15 px-1.5 py-0.5 rounded-[5px]">${formatDateIndo(item.date)}</span>
-            </div>
-            <p class="text-[11px] font-medium text-white/80 mt-0.5 break-words">${item.description || '-'}</p>
-          </div>
-          <span class="font-semibold text-ios-green shrink-0 text-right whitespace-nowrap mt-0.5">${formatRp(item.amount)}</span>
-        </div>
-      `).join('');
+  const maxOut = Math.max(...Object.values(cOut), 1); const rcOut = document.getElementById('container-report-cat-out'); const outEntries = Object.entries(cOut).sort((a,b) => b[1] - a[1]);
+  if(outEntries.length === 0) { rcOut.innerHTML = `<div class="text-[9.5px] text-white/30 font-semibold uppercase tracking-widest text-center py-1.5">Nihil</div>`; } 
+  else { rcOut.innerHTML = outEntries.map(([c, a]) => { const pct = Math.round((a / maxOut) * 100); const txList = (detailsOut[c] || []).sort((a,b) => new Date(b.date) - new Date(a.date)); const itemsHtml = txList.map(item => `<div class="flex justify-between items-start text-[10.5px] text-white/70 py-1 border-t border-white/5 gap-1.5"><div class="flex-1 min-w-0"><span class="text-[8.5px] font-bold text-ios-red bg-ios-red/15 px-1 py-[1px] rounded-[3px] mr-1">${formatDateIndo(item.date)}</span><span class="break-words">${item.description || '-'}</span></div><span class="font-semibold text-ios-red shrink-0 text-right whitespace-nowrap mt-0.5">${formatRp(item.amount)}</span></div>`).join(''); return `<div class="bg-black/30 p-2 rounded-[10px] border border-white/5"><div class="flex justify-between items-center text-[11px] mb-1"><span class="text-white font-bold truncate flex-1">${c}</span><span class="font-extrabold text-ios-red shrink-0 ml-2">${formatRp(a)}</span></div><div class="w-full bg-black/40 rounded-full h-1 mb-1.5"><div class="bg-ios-red h-1 rounded-full transition-all" style="width: ${pct}%;"></div></div><div class="space-y-0.5 mt-1.5"><div class="text-[8.5px] font-bold uppercase tracking-wider text-white/40 mb-1">Rincian (${txList.length}):</div>${itemsHtml}</div></div>`; }).join(''); }
+}
 
-      return `
-        <div class="bg-black/30 p-2.5 rounded-[14px] border border-white/5">
-          <div class="flex justify-between items-center text-[12px] mb-1">
-            <span class="text-white font-bold truncate flex-1">${c}</span>
-            <span class="font-extrabold text-ios-green shrink-0 ml-2">${formatRp(a)}</span>
-          </div>
-          <div class="w-full bg-black/40 rounded-full h-1.5 mb-2">
-            <div class="bg-ios-green h-1.5 rounded-full transition-all duration-500" style="width: ${pct}%;"></div>
-          </div>
-          <div class="space-y-0.5 mt-2">
-            <div class="text-[9px] font-bold uppercase tracking-wider text-white/40 mb-1">Keterangan Lengkap (${txList.length}):</div>
-            ${itemsHtml}
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
+function generateWhatsAppMessageText(customUrl = '') {
+  const m = document.getElementById('report-month').value, y = document.getElementById('report-year').value; const t = new Date(); const dStr = formatDateIndo(t.toISOString().split('T')[0]); const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; const mIdx = parseInt(m, 10) - 1; const currentMonthName = mn[mIdx]; let prevMonthIdx = mIdx - 1; let prevYearStr = y; if (prevMonthIdx < 0) { prevMonthIdx = 11; prevYearStr = (parseInt(y, 10) - 1).toString(); }
+  
+  let txt = `*REKAP KEUANGAN PAGUYUBAN*\n_Per: ${dStr}_\n------------------------\n\n`;
+  txt += `💼 Saldo Akhir ${mn[prevMonthIdx]} ${prevYearStr}: ${document.getElementById('report-prev-balance').innerText}\n📈 Pemasukan ${currentMonthName}: ${document.getElementById('report-in').innerText}\n📉 Pengeluaran ${currentMonthName}: ${document.getElementById('report-out').innerText}\n💰 *KAS AKTIF: ${document.getElementById('report-net').innerText}*\n\n`;
+  
+  let iTotal = 0, iDets = [], oDets = [];
+  (appState.transactions || []).forEach(tx => { if(!tx.date) return; const [ty, tm] = tx.date.split('-'); if (ty === y && tm === m) { const amt = Number(tx.amount) || 0; if (tx.type === 'Pemasukan') { if (isIuran(tx.category)) iTotal += amt; else iDets.push(`+ ${tx.category}: ${formatRp(amt)} ${tx.description ? '('+tx.description+')' : ''}`); } else if (tx.type === 'Pengeluaran') { oDets.push(`- ${tx.category}: ${formatRp(amt)} ${tx.description ? '('+tx.description+')' : ''}`); } } });
 
-  const maxOut = Math.max(...Object.values(cOut), 1);
-  const rcOut = document.getElementById('container-report-cat-out');
-  const outEntries = Object.entries(cOut).sort((a,b) => b[1] - a[1]);
+  if (iTotal > 0 || iDets.length > 0) { txt += `*Rincian Pemasukan:*\n`; if (iTotal > 0) txt += `+ Iuran Bulanan: ${formatRp(iTotal)}\n`; if (iDets.length > 0) txt += iDets.join('\n') + '\n'; txt += `\n`; }
+  if (oDets.length > 0) { txt += `*Rincian Pengeluaran:*\n`; txt += oDets.join('\n') + '\n\n'; }
+  
+  const unp = [], arr = []; (appState.members || []).forEach(mbr => { const st = getMemberDuesStatus(mbr); if(!st.isPaid) unp.push(mbr.name); if(st.arrears>1) arr.push(`${mbr.name} (${st.arrears} bln)`); });
+  
+  if(unp.length > 0) txt += `📌 *BELUM BAYAR BULAN INI:*\n${unp.map(x=>`- ${x}`).join('\n')}\n\n`; if(arr.length > 0) txt += `⚠️ *BELUM BAYAR (>1 BLN):*\n${arr.map(x=>`- ${x}`).join('\n')}\n\n`; if (customUrl && customUrl.trim() !== '') txt += `pantau perkembangan nya di link berikut :\n${customUrl.trim()}\n\n`; txt += `Terima kasih! 🙏\n_~ Admin_`; return txt;
+}
 
-  if(outEntries.length === 0) {
-    rcOut.innerHTML = `<div class="text-[10px] text-white/30 font-semibold uppercase tracking-widest text-center py-3">Belum ada pengeluaran</div>`;
-  } else {
-    rcOut.innerHTML = outEntries.map(([c, a]) => {
-      const pct = Math.round((a / maxOut) * 100);
-      const txList = (detailsOut[c] || []).sort((a,b) => new Date(b.date) - new Date(a.date));
-      
-      const itemsHtml = txList.map(item => `
-        <div class="flex justify-between items-start text-[11px] text-white/70 py-1.5 border-t border-white/5 gap-2">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[9px] font-bold text-ios-red bg-ios-red/15 px-1.5 py-0.5 rounded-[5px]">${formatDateIndo(item.date)}</span>
-            </div>
-            <p class="text-[11px] font-medium text-white/80 mt-0.5 break-words">${item.description || '-'}</p>
-          </div>
-          <span class="font-semibold text-ios-red shrink-0 text-right whitespace-nowrap mt-0.5">${formatRp(item.amount)}</span>
-        </div>
-      `).join('');
+function generateWhatsAppMembersStatusText() {
+  const m = document.getElementById('report-month').value, y = document.getElementById('report-year').value; const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; const targetYear = parseInt(y, 10), targetMonth = parseInt(m, 10); const sortedMembers = [...(appState.members || [])].sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+  let paidCount = 0, unpaidCount = 0, memberLines = [];
+  sortedMembers.forEach(mbr => {
+    let lastYM = null; if (mbr.lastPaid && mbr.lastPaid.includes('-')) { const p = mbr.lastPaid.split('-'); lastYM = { year: parseInt(p[0], 10), month: parseInt(p[1], 10) }; } else if (mbr.joinDate && mbr.joinDate.includes('-')) { const p = mbr.joinDate.split('-'); if(p.length >= 2) { let jY = parseInt(p[0], 10), jM = parseInt(p[1], 10); lastYM = jM === 1 ? { year: jY - 1, month: 12 } : { year: jY, month: jM - 1 }; } }
+    let paid = false; if(lastYM) { const targetValue = targetYear * 12 + targetMonth; const lastPaidValue = lastYM.year * 12 + lastYM.month; paid = lastPaidValue >= targetValue; }
+    if (paid) { paidCount++; memberLines.push(`✅ ${mbr.name}`); } else { unpaidCount++; memberLines.push(`❌ ${mbr.name}`); }
+  });
+  let txt = `*STATUS IURAN ANGGOTA*\n*Periode: ${mn[targetMonth-1]} ${y}*\n------------------\n\n`; txt += memberLines.join('\n') + `\n\n------------------\n`; txt += `📊 *Ringkasan:* \n✅ Lunas: ${paidCount}\n❌ Belum: ${unpaidCount}\nTotal: ${sortedMembers.length}\n\n`; txt += `bagi yang sudah transfer tapi belum tercatat mohon konfirmasi ke admin untuk dilakukan kroscek. 🙏\n_~ Admin_`; return txt;
+}
 
-      return `
-        <div class="bg-black/30 p-2.5 rounded-[14px] border border-white/5">
-          <div class="flex justify-between items-center text-[12px] mb-1">
-            <span class="text-white font-bold truncate flex-1">${c}</span>
-            <span class="font-extrabold text-ios-red shrink-0 ml-2">${formatRp(a)}</span>
-          </div>
-          <div class="w-full bg-black/40 rounded-full h-1.5 mb-2">
-            <div class="bg-ios-red h-1.5 rounded-full transition-all duration-500" style="width: ${pct}%;"></div>
- 
+function openWhatsAppPreviewModal() { document.getElementById('modal-wa-title').innerText = 'Laporan WA R
