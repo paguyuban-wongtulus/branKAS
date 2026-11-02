@@ -1339,18 +1339,18 @@ function generateWhatsAppMessageText() {
   const customUrl = getWaLinkSetting();
   const m = document.getElementById('report-month').value, y = document.getElementById('report-year').value; const t = new Date(); const dStr = formatDateIndo(t.toISOString().split('T')[0]); const mn = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; const mIdx = parseInt(m, 10) - 1; const currentMonthName = mn[mIdx]; let prevMonthIdx = mIdx - 1; let prevYearStr = y; if (prevMonthIdx < 0) { prevMonthIdx = 11; prevYearStr = (parseInt(y, 10) - 1).toString(); }
   
-  let txt = `*REKAP KEUANGAN PAGUYUBAN*\n_Per: ${dStr}_\n------------------------\n\n`;
-  txt += `ðŸ’¼ Saldo Akhir ${mn[prevMonthIdx]} ${prevYearStr}: ${document.getElementById('report-prev-balance').innerText}\nðŸ“ˆ Pemasukan ${currentMonthName}: ${document.getElementById('report-in').innerText}\nðŸ“‰ Pengeluaran ${currentMonthName}: ${document.getElementById('report-out').innerText}\nðŸ’° *KAS AKTIF: ${document.getElementById('report-net').innerText}*\n\n`;
+  let txt = `ðŸ“Š *REKAP KEUANGAN PAGUYUBAN*\nðŸ—“ï¸ _Per: ${dStr}_\n------------------------\n\n`;
+  txt += `ðŸ’¼ *Saldo Akhir ${mn[prevMonthIdx]} ${prevYearStr}:* ${document.getElementById('report-prev-balance').innerText}\nðŸŸ¢ *Pemasukan ${currentMonthName}:* ${document.getElementById('report-in').innerText}\nðŸ”´ *Pengeluaran ${currentMonthName}:* ${document.getElementById('report-out').innerText}\nðŸ’° *KAS AKTIF: ${document.getElementById('report-net').innerText}*\n\n`;
   
   let iTotal = 0, iDets = [], oDets = [];
-  (appState.transactions || []).forEach(tx => { if(!tx.date) return; const [ty, tm] = tx.date.split('-'); if (ty === y && tm === m) { const amt = Number(tx.amount) || 0; if (tx.type === 'Pemasukan') { if (isIuran(tx.category)) iTotal += amt; else iDets.push(`+ ${tx.category}: ${formatRp(amt)} ${tx.description ? '('+tx.description+')' : ''}`); } else if (tx.type === 'Pengeluaran') { oDets.push(`- ${tx.category}: ${formatRp(amt)} ${tx.description ? '('+tx.description+')' : ''}`); } } });
+  (appState.transactions || []).forEach(tx => { if(!tx.date) return; const [ty, tm] = tx.date.split('-'); if (ty === y && tm === m) { const amt = Number(tx.amount) || 0; if (tx.type === 'Pemasukan') { if (isIuran(tx.category)) iTotal += amt; else iDets.push(`âž• ${tx.category}: ${formatRp(amt)} ${tx.description ? '('+tx.description+')' : ''}`); } else if (tx.type === 'Pengeluaran') { oDets.push(`âž– ${tx.category}: ${formatRp(amt)} ${tx.description ? '('+tx.description+')' : ''}`); } } });
 
-  if (iTotal > 0 || iDets.length > 0) { txt += `*Rincian Pemasukan:*\n`; if (iTotal > 0) txt += `+ Iuran Bulanan: ${formatRp(iTotal)}\n`; if (iDets.length > 0) txt += iDets.join('\n') + '\n'; txt += `\n`; }
-  if (oDets.length > 0) { txt += `*Rincian Pengeluaran:*\n`; txt += oDets.join('\n') + '\n\n'; }
+  if (iTotal > 0 || iDets.length > 0) { txt += `ðŸ“¥ *Rincian Pemasukan:*\n`; if (iTotal > 0) txt += `âž• Iuran Bulanan: ${formatRp(iTotal)}\n`; if (iDets.length > 0) txt += iDets.join('\n') + '\n'; txt += `\n`; }
+  if (oDets.length > 0) { txt += `ðŸ“¤ *Rincian Pengeluaran:*\n`; txt += oDets.join('\n') + '\n\n'; }
   
   const unp = [], arr = []; (appState.members || []).forEach(mbr => { const st = getMemberDuesStatus(mbr); if(!st.isPaid) unp.push(mbr.name); if(st.arrears>1) arr.push(`${mbr.name} (${st.arrears} bln)`); });
   
-  if(unp.length > 0) txt += `ðŸ“Œ *BELUM BAYAR BULAN INI:*\n${unp.map(x=>`- ${x}`).join('\n')}\n\n`; if(arr.length > 0) txt += `âš ï¸ *BELUM BAYAR (>1 BLN):*\n${arr.map(x=>`- ${x}`).join('\n')}\n\n`; if (customUrl && customUrl.trim() !== '') txt += `pantau perkembangan nya di link berikut :\n${customUrl.trim()}\n\n`; txt += `Terima kasih! ðŸ™\n_~ Admin_`; return txt;
+  if(unp.length > 0) txt += `ðŸ“Œ *BELUM BAYAR BULAN INI:*\n${unp.map(x=>`ðŸ”¸ ${x}`).join('\n')}\n\n`; if(arr.length > 0) txt += `âš ï¸ *BELUM BAYAR (>1 BLN):*\n${arr.map(x=>`ðŸ”» ${x}`).join('\n')}\n\n`; if (customUrl && customUrl.trim() !== '') txt += `ðŸŒ *Pantau perkembangan kas di link berikut:*\n${customUrl.trim()}\n\n`; txt += `Terima kasih! ðŸ™\n_~ Admin_`; return txt;
 }
 
 function generateWhatsAppMembersStatusText() {
@@ -1361,7 +1361,7 @@ function generateWhatsAppMembersStatusText() {
     let paid = false; if(lastYM) { const targetValue = targetYear * 12 + targetMonth; const lastPaidValue = lastYM.year * 12 + lastYM.month; paid = lastPaidValue >= targetValue; }
     if (paid) { paidCount++; memberLines.push(`âœ… ${mbr.name}`); } else { unpaidCount++; memberLines.push(`âŒ ${mbr.name}`); }
   });
-  let txt = `*STATUS IURAN ANGGOTA*\n*Periode: ${mn[targetMonth-1]} ${y}*\n------------------\n\n`; txt += memberLines.join('\n') + `\n\n------------------\n`; txt += `ðŸ“Š *Ringkasan:* \nâœ… Lunas: ${paidCount}\nâŒ Belum: ${unpaidCount}\nTotal: ${sortedMembers.length}\n\n`; txt += `bagi yang sudah transfer tapi belum tercatat mohon konfirmasi ke admin untuk dilakukan kroscek. ðŸ™\n_~ Admin_`; return txt;
+  let txt = `ðŸ“‹ *STATUS IURAN ANGGOTA*\nðŸ—“ï¸ *Periode: ${mn[targetMonth-1]} ${y}*\n------------------\n\n`; txt += memberLines.join('\n') + `\n\n------------------\n`; txt += `ðŸ“Š *Ringkasan:* \nâœ… Lunas: ${paidCount}\nâŒ Belum: ${unpaidCount}\nðŸ‘¥ Total: ${sortedMembers.length}\n\n`; txt += `ðŸ’¡ _Bagi yang sudah transfer tapi belum tercatat, mohon konfirmasi ke admin untuk dilakukan kroscek._ ðŸ™\n\n_~ Admin_`; return txt;
 }
 
 function openWhatsAppPreviewModal() { document.getElementById('modal-wa-title').innerText = 'Laporan WA Rekap'; document.getElementById('whatsapp-text-preview').value = generateWhatsAppMessageText(); document.getElementById('modal-backdrop').classList.remove('hidden'); document.getElementById('modal-whatsapp').classList.add('open'); document.getElementById('app-wrapper').classList.add('modal-active'); requestAnimationFrame(() => document.getElementById('modal-backdrop').classList.add('opacity-100')); }
